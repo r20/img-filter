@@ -1,4 +1,4 @@
-import { defaultContrast, defaultGrayscale } from "./components/FilterSettings";
+import { FilterLevel } from "./types";
 
 const insertCss = (tabId: number, css: string) => {
   try {
@@ -6,7 +6,7 @@ const insertCss = (tabId: number, css: string) => {
       {
         target: {
           tabId: tabId,
-          allFrames: true, // jmr - inject in to all frames within the tab (maybe don't need to obscure iframe if this works)
+          // allFrames: true, // jmr - inject in to all frames within the tab (maybe don't need to obscure iframe if this works)
         },
         css: css,
         origin: "USER", // jmr - should we do USER?
@@ -26,7 +26,7 @@ const removeCss = (tabId: number, css: string) => {
     return chrome.scripting.removeCSS({
       target: {
         tabId: tabId,
-        allFrames: true, // jmr - inject in to all frames within the tab (maybe don't need to obscure iframe if this works)
+        // allFrames: true, // jmr - inject in to all frames within the tab (maybe don't need to obscure iframe if this works)
       },
       css: css,
       origin: "USER", // jmr - should we do USER?
@@ -37,52 +37,111 @@ const removeCss = (tabId: number, css: string) => {
   }
 };
 
-const buildCss = (grayscale: number = defaultGrayscale, contrast: number = defaultContrast) => {
-  const css = `img,video,iframe {filter: contrast(${contrast}%) grayscale(${grayscale}%) !important;} *[style*="background-image:"] {filter: contrast(${contrast}%) grayscale(${grayscale}%) !important;}`;
+const buildCss = (imgLevel: FilterLevel, iframeLevel: FilterLevel) => {
+  let imgGrayscale, iframeGrayscale, imgContrast, iframeContrast;
+  if (imgLevel === FilterLevel.None) {
+    imgGrayscale = 0;
+    imgContrast = 100;
+  } else if (imgLevel === FilterLevel.Low) {
+    imgGrayscale = 50;
+    imgContrast = 50;
+  } else if (imgLevel === FilterLevel.Medium) {
+    imgGrayscale = 90;
+    imgContrast = 15;
+  } else {
+    // Doesn't matter what grayscale is
+    imgGrayscale = 50;
+    imgContrast = 100;
+  }
+
+  if (iframeLevel === FilterLevel.None) {
+    iframeGrayscale = 0;
+    iframeContrast = 100;
+  } else if (iframeLevel === FilterLevel.Low) {
+    iframeGrayscale = 50;
+    iframeContrast = 50;
+  } else if (iframeLevel === FilterLevel.Medium) {
+    iframeGrayscale = 90;
+    iframeContrast = 15;
+  } else {
+    // Doesn't matter what grayscale is
+    iframeGrayscale = 50;
+    iframeContrast = 100;
+  }
+  const css = `iframe {filter: contrast(${iframeContrast}%) grayscale(${iframeGrayscale}%) !important;} img,video {filter: contrast(${imgContrast}%) grayscale(${imgGrayscale}%) !important;} *[style*="background-image:"] {filter: contrast(${imgContrast}%) grayscale(${imgGrayscale}%) !important;}`;
   return css;
 };
 
-// Handle when a new tab is created with a url (often it doesn't have one so this will do nothing)
-chrome.tabs.onCreated.addListener((tab) => {
-  const tabId = tab.id;
-  if (tabId && tab.url) {
-    chrome.storage.sync.get(
-      {
-        grayscale: defaultGrayscale,
-        contrast: defaultContrast,
-        isEnabled: true,
-        sitesNotFiltered: [],
-      },
-      (items) => {
-        const { grayscale, contrast, isEnabled, sitesNotFiltered } = items;
+interface IInsertedCssMap {
+  [key: string]: string;
+}
+/* This will hold css that has been inserted and can be used to remove it */
+let insertedCssMap: IInsertedCssMap = {};
 
-        if (isEnabled && tab.url?.startsWith("http")) {
-          insertCss(tabId, buildCss(grayscale, contrast));
+const setCss = (tab: chrome.tabs.Tab) => {
+  chrome.storage.sync.get(
+    {
+      imgLevel: FilterLevel.Low,
+      iframeLevel: FilterLevel.Medium,
+      isEnabled: true,
+    },
+    (items) => {
+      const { imgLevel, iframeLevel, isEnabled } = items;
+
+      console.log("jmr - isEnabled and tab", isEnabled, tab);
+
+      if (tab && tab.id && tab.url && tab.url?.startsWith("http")) {
+        const newCss = buildCss(imgLevel, iframeLevel);
+        const oldCss = insertedCssMap[tab.id] || "";
+        console.log("jmr - new and old css", newCss, oldCss);
+
+        if (oldCss && (newCss !== oldCss || !isEnabled)) {
+          // There's old, and it's eitehr cahnged or turned off
+          // Don't bother waiting for remove (which is an async operation). I think it's ok to add other css before remove is finished.
+          console.log("jmr - removing oldCss", oldCss, tab);
+          removeCss(tab.id, oldCss);
+          delete insertedCssMap[tab.id];
+        }
+
+        if (isEnabled && newCss !== oldCss) {
+          // It's on and it's not already set
+          console.log("jmr - inserting newCss", newCss, tab);
+          insertCss(tab.id, newCss);
+
+          insertedCssMap[tab.id] = newCss;
         }
       }
-    );
+    }
+  );
+};
+
+// jmr - need to handle when reload a page
+
+// Handle when a tab is updated with a new url or reloaded
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (tabId && tab.url && (changeInfo.url || changeInfo.status === "loading")) {
+    console.log("jmr - onChange", tabId, tab, changeInfo);
+    // Wwen this happens the inserted css is no longer there. So remove it from the map.
+    delete insertedCssMap[tabId];
+    setCss(tab);
   }
 });
 
-// Handle when a tab is updated with a new url (looking at changeInfo.url)
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (tabId && tab.url && changeInfo.url) {
-    chrome.storage.sync.get(
-      {
-        grayscale: defaultGrayscale,
-        contrast: defaultContrast,
-        isEnabled: true,
-        sitesNotFiltered: [],
-      },
-      (items) => {
-        const { grayscale, contrast, isEnabled, sitesNotFiltered } = items;
+// Initially, get the active tab and apply css if needed
+chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+  // since only one tab should be active and in the current window at once
+  // the return variable should only have one entry
+  var tab = tabs[0];
+  setCss(tab);
+});
 
-        if (isEnabled && tab.url?.startsWith("http")) {
-          insertCss(tabId, buildCss(grayscale, contrast));
-        }
-      }
-    );
-  }
+// Handle when the active tab changes
+chrome.tabs.onActivated.addListener((activeInfo) => {
+  console.log("jmr - onActivated", activeInfo);
+  chrome.tabs.get(activeInfo.tabId, (tab) => {
+    console.log("jmr - active tab", tab);
+    setCss(tab);
+  });
 });
 
 // Handle when the settings in storage change
@@ -95,63 +154,10 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
       );
     }
 
-    // If something changes, only the keys that were changed are in the changes variable.  We need more than that, so get all the values.
-    chrome.storage.sync.get(
-      {
-        grayscale: defaultGrayscale,
-        contrast: defaultContrast,
-        isEnabled: true,
-        sitesNotFiltered: [],
-      },
-      (items) => {
-        const { grayscale, contrast, isEnabled, sitesNotFiltered } = items;
-
-        let oldCssToRemove = "";
-        let newCssToAdd = "";
-        if (changes.isEnabled?.newValue === true) {
-          // It was turned on
-          newCssToAdd = buildCss(grayscale, contrast);
-        } else if (changes.isEnabled?.newValue === false) {
-          // It was turned off
-          const oldGrayscale = changes.grayscale?.oldValue !== undefined ? changes.grayscale?.oldValue : grayscale;
-          const oldContrast = changes.contrast?.oldValue !== undefined ? changes.contrast?.oldValue : contrast;
-          oldCssToRemove = buildCss(oldGrayscale, oldContrast);
-        } else if (isEnabled && (changes.grayscale || changes.contrast)) {
-          // It was already on and something else changed
-          const oldGrayscale = changes.grayscale?.oldValue !== undefined ? changes.grayscale?.oldValue : grayscale;
-          const oldContrast = changes.contrast?.oldValue !== undefined ? changes.contrast?.oldValue : contrast;
-          oldCssToRemove = buildCss(oldGrayscale, oldContrast);
-
-          newCssToAdd = buildCss(grayscale, contrast);
-        }
-
-        chrome.tabs.query({}, async (tabs) => {
-          // Remove old css if needed
-          const promises = [];
-
-          if (oldCssToRemove) {
-            for (let idx = 0; idx < tabs.length; idx++) {
-              const tabId = tabs[idx].id;
-              if (tabId !== undefined && tabs[idx].url && tabs[idx].url?.startsWith("http")) {
-                // Either the extension is not enabled or it is but the css changed.   Remove the old css.
-                promises.push(removeCss(tabId, oldCssToRemove));
-              }
-            }
-          }
-          await promises; // If we need to insert new, we want to wait until old is removed
-
-          // After waiting, add new css if needed
-          if (newCssToAdd) {
-            for (let idx = 0; idx < tabs.length; idx++) {
-              const tabId = tabs[idx].id;
-              if (tabId !== undefined && tabs[idx].url && tabs[idx].url?.startsWith("http")) {
-                // It was enabled, or it was already enabled and the css changed.
-                promises.push(insertCss(tabId, newCssToAdd));
-              }
-            }
-          }
-        });
-      }
-    );
+    chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
+      // since only one tab should be active and in the current window at once the return variable should only have one entry
+      var tab = tabs[0];
+      setCss(tab);
+    });
   }
 });
