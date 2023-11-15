@@ -1,6 +1,6 @@
-# Reduce Image Distraction
+# Ad and Image Noise Reducer
 
-Chrome extension to reduce distraction by applying masks to images and iframes.
+Reduce ad and image distraction by applying filter masks over iframes (which often serve ads) and images. Exceptionize your experience with filter level controls and the ability to add website-specific rules. This extension won't catch everything (but handles most) because we prioritized having very low impact (no additional network calls or intensive page examination).
 
 ### jmr todo
 

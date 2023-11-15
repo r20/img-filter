@@ -2,7 +2,7 @@
   "compilerOptions": {
     "strict": true,
     "target": "es2017",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "module": "esnext",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,

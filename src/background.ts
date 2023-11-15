@@ -1,4 +1,5 @@
-import { FilterLevel } from "./types";
+import { FilterLevel, IStoredValues } from "./types";
+import { checkUrlEligibility, getMatchingRules } from "./utilities";
 
 const insertCss = (tabId: number, css: string) => {
   try {
@@ -16,7 +17,12 @@ const insertCss = (tabId: number, css: string) => {
       }
     );
   } catch (err) {
-    console.log("There was an error inserting css for tabId", tabId, "and css", css);
+    console.log(
+      "There was an error inserting css for tabId",
+      tabId,
+      "and css",
+      css
+    );
     return Promise.resolve();
   }
 };
@@ -32,7 +38,12 @@ const removeCss = (tabId: number, css: string) => {
       origin: "USER", // jmr - should we do USER?
     });
   } catch (err) {
-    console.log("There was an error removing css for tabId", tabId, "and css", css);
+    console.log(
+      "There was an error removing css for tabId",
+      tabId,
+      "and css",
+      css
+    );
     return Promise.resolve();
   }
 };
@@ -51,7 +62,7 @@ const buildCss = (imgLevel: FilterLevel, iframeLevel: FilterLevel) => {
   } else {
     // Doesn't matter what grayscale is
     imgGrayscale = 50;
-    imgContrast = 100;
+    imgContrast = 0;
   }
 
   if (iframeLevel === FilterLevel.None) {
@@ -66,7 +77,7 @@ const buildCss = (imgLevel: FilterLevel, iframeLevel: FilterLevel) => {
   } else {
     // Doesn't matter what grayscale is
     iframeGrayscale = 50;
-    iframeContrast = 100;
+    iframeContrast = 0;
   }
   const css = `iframe {filter: contrast(${iframeContrast}%) grayscale(${iframeGrayscale}%) !important;} img,video {filter: contrast(${imgContrast}%) grayscale(${imgGrayscale}%) !important;} *[style*="background-image:"] {filter: contrast(${imgContrast}%) grayscale(${imgGrayscale}%) !important;}`;
   return css;
@@ -79,40 +90,57 @@ interface IInsertedCssMap {
 let insertedCssMap: IInsertedCssMap = {};
 
 const setCss = (tab: chrome.tabs.Tab) => {
-  chrome.storage.sync.get(
-    {
-      imgLevel: FilterLevel.Low,
-      iframeLevel: FilterLevel.Medium,
-      isEnabled: true,
-    },
-    (items) => {
-      const { imgLevel, iframeLevel, isEnabled } = items;
+  const defaults: IStoredValues = {
+    generalImgLevel: FilterLevel.Low,
+    generalIframeLevel: FilterLevel.Medium,
+    isEnabled: true,
+    exceptionRulesArray: [],
+  };
 
-      console.log("jmr - isEnabled and tab", isEnabled, tab);
+  chrome.storage.sync.get(defaults, (items) => {
+    const {
+      generalImgLevel,
+      generalIframeLevel,
+      isEnabled,
+      exceptionRulesArray,
+    } = items;
 
-      if (tab && tab.id && tab.url && tab.url?.startsWith("http")) {
-        const newCss = buildCss(imgLevel, iframeLevel);
-        const oldCss = insertedCssMap[tab.id] || "";
-        console.log("jmr - new and old css", newCss, oldCss);
+    console.log("jmr - isEnabled and tab", isEnabled, tab);
 
-        if (oldCss && (newCss !== oldCss || !isEnabled)) {
-          // There's old, and it's eitehr cahnged or turned off
-          // Don't bother waiting for remove (which is an async operation). I think it's ok to add other css before remove is finished.
-          console.log("jmr - removing oldCss", oldCss, tab);
-          removeCss(tab.id, oldCss);
-          delete insertedCssMap[tab.id];
-        }
+    if (tab && tab.id && checkUrlEligibility(tab.url)) {
+      const matchingRules = getMatchingRules(
+        tab.url as string,
+        exceptionRulesArray
+      );
 
-        if (isEnabled && newCss !== oldCss) {
-          // It's on and it's not already set
-          console.log("jmr - inserting newCss", newCss, tab);
-          insertCss(tab.id, newCss);
+      /* Use the last matching rule.  That's how they are displayed to users too. */
+      const lastMatch = matchingRules.length
+        ? matchingRules[matchingRules.length - 1]
+        : null;
+      const imgLevel = lastMatch?.imgLevel || generalImgLevel;
+      const iframeLevel = lastMatch?.iframeLevel || generalIframeLevel;
 
-          insertedCssMap[tab.id] = newCss;
-        }
+      const newCss = buildCss(imgLevel, iframeLevel);
+      const oldCss = insertedCssMap[tab.id] || "";
+      // console.log("jmr - new and old css", newCss, oldCss);
+
+      if (oldCss && (newCss !== oldCss || !isEnabled)) {
+        // There's old, and it's either changed or turned off
+        // Don't bother waiting for remove (which is an async operation). I think it's ok to add other css before remove is finished.
+        console.log("jmr - removing oldCss", oldCss, tab);
+        removeCss(tab.id, oldCss);
+        delete insertedCssMap[tab.id];
+      }
+
+      if (isEnabled && newCss !== oldCss) {
+        // It's on and it's not already set
+        console.log("jmr - inserting newCss", newCss, tab);
+        insertCss(tab.id, newCss);
+
+        insertedCssMap[tab.id] = newCss;
       }
     }
-  );
+  });
 };
 
 // jmr - need to handle when reload a page

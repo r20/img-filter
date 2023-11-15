@@ -6,14 +6,23 @@ export enum FilterLevel {
 }
 
 export enum MatchType {
-  Contains = 0,
-  StartsWith = 1,
+  Contains = "Contains",
+  StartsWith = "Starts with",
 }
 
-export interface ISiteOverride {
+export interface IExceptionRule {
   idx: number;
   matchType: MatchType;
   matchString: string;
   imgLevel: FilterLevel;
   iframeLevel: FilterLevel;
+}
+
+export interface IStoredValues {
+  isEnabled?: boolean;
+  generalImgLevel?: FilterLevel;
+  generalIframeLevel?: FilterLevel;
+  exceptionRulesArray?: IExceptionRule[];
+  lastExceptionImgLevelUsed?: FilterLevel;
+  lastExceptionIframeLevelUsed?: FilterLevel;
 }

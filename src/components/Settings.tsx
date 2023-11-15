@@ -1,50 +1,31 @@
-import React, { useEffect, useState } from "react";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Switch from "@mui/material/Switch";
-import Stack from "@mui/material/Stack";
+import React from "react";
+import styled from "@emotion/styled";
 
-import StandardFilterSettings from "./StandardFilterSettings";
-import SiteOverrideList from "./SiteOverrideList";
+import DefaultFilterSettings from "./DefaultFilterSettings";
+import AllExceptionRules from "./AllExceptionRules";
+import ActiveTabException from "./ActiveTabException";
+import { useActiveTabContext } from "../context/ActiveTabContext";
+import FilteringIsEnabled from "./FilteringIsEnabled";
+
+const StyledDiv = styled.div`
+  width: 770px;
+  margin: 15px;
+  min-height: 280px;
+  & > * {
+    margin-top: 40px;
+  }
+`;
 
 const Settings = () => {
-  const [isEnabled, setIsEnabled] = useState<boolean>(true);
-
-  useEffect(() => {
-    // Restores preferences stored in chrome.storage.
-    chrome.storage.sync.get(
-      {
-        isEnabled: true,
-      },
-      (items) => {
-        setIsEnabled(items.isEnabled);
-      }
-    );
-  }, []);
-
-  const saveIsEnabled = (newIsEnabled: boolean) => {
-    chrome.storage.sync.set({ isEnabled: newIsEnabled });
-    setIsEnabled(newIsEnabled);
-  };
+  const { activeTabMatchingRules } = useActiveTabContext();
 
   return (
-    <div style={{ width: "700px", padding: "20px", minHeight: "280px" }}>
-      <Stack spacing={2}>
-        <FormControlLabel
-          control={
-            <Switch
-              checked={isEnabled}
-              onChange={(evt) => saveIsEnabled(evt.target.checked)}
-              inputProps={{ "aria-label": "Is Enabled" }}
-            />
-          }
-          label="Enable"
-        />
-
-        <StandardFilterSettings />
-
-        <SiteOverrideList />
-      </Stack>
-    </div>
+    <StyledDiv>
+      <FilteringIsEnabled />
+      <DefaultFilterSettings disabled={activeTabMatchingRules.length > 0} />
+      <ActiveTabException />
+      <AllExceptionRules />
+    </StyledDiv>
   );
 };
 

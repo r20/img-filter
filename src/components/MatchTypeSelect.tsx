@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import Box from "@mui/material/Box";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
@@ -20,12 +20,14 @@ const MatchTypeSelect = ({ idPrefix, selectedValue, onSelection }: IProps) => {
   return (
     <Box sx={{ minWidth: 120 }}>
       <FormControl fullWidth size="small">
-        <InputLabel id={`${idPrefix}-host-match-type-select-label`}>Should</InputLabel>
+        <InputLabel id={`${idPrefix}-host-match-type-select-label`}>
+          should
+        </InputLabel>
         <Select
           labelId={`${idPrefix}-host-match-type-select-label`}
           id={`${idPrefix}-host-match-type-select`}
           value={val}
-          label="Should"
+          label="should"
           onChange={handleChange}
         >
           <MenuItem value={MatchType.Contains}>Contain</MenuItem>

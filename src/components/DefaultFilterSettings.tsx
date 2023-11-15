@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import debounce from "lodash/debounce";
 
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
@@ -9,67 +8,66 @@ import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
 
-import { FilterLevel } from "../types";
+import { FilterLevel, IStoredValues } from "../types";
 
-/* These setting apply to all sites that don't have site specific settings */
-const StandardFilterSettings = () => {
-  const [imgLevel, setImgLevel] = useState<FilterLevel>(FilterLevel.Low);
-  const [iframeLevel, setIframeLevel] = useState<FilterLevel>(FilterLevel.Medium);
+interface IProps {
+  disabled: boolean;
+}
 
-  useEffect(() => {
-    // Restores preferences stored in chrome.storage.
-    chrome.storage.sync.get(
-      {
-        imgLevel: FilterLevel.Low,
-        iframeLevel: FilterLevel.Medium,
-      },
-      (items) => {
-        setImgLevel(items.imgLevel);
-        setIframeLevel(items.iframeLevel);
-      }
-    );
-  }, []);
-
-  const saveImgLevel = (newVal: FilterLevel) => {
-    chrome.storage.sync.set({ imgLevel: newVal });
-  };
-  const saveIframeLevel = (newVal: FilterLevel) => {
-    chrome.storage.sync.set({ iframeLevel: newVal });
-  };
-
-  const debouncedSaveImgLevel = React.useCallback(debounce(saveImgLevel, 200), []);
-  const debouncedSaveIframeLevel = React.useCallback(debounce(saveIframeLevel, 200), []);
+/* These setting apply to all sites that don't have exception rules */
+const DefaultFilterSettings = ({ disabled }: IProps) => {
+  const [generalImgLevel, setGeneralImgLevel] = useState<FilterLevel>(
+    FilterLevel.Low
+  );
+  const [generalIframeLevel, setGeneralIframeLevel] = useState<FilterLevel>(
+    FilterLevel.Medium
+  );
 
   useEffect(() => {
-    // Cleanup when unmount
-    return () => {
-      debouncedSaveImgLevel.cancel();
-      debouncedSaveIframeLevel.cancel();
+    const defaults: IStoredValues = {
+      generalImgLevel: FilterLevel.Low,
+      generalIframeLevel: FilterLevel.Medium,
     };
+    // Restores preferences stored in chrome.storage.
+    chrome.storage.sync.get(defaults, (items) => {
+      setGeneralImgLevel(items.generalImgLevel);
+      setGeneralIframeLevel(items.generalIframeLevel);
+    });
   }, []);
 
-  const handleImgLevelChange = (event: React.MouseEvent<HTMLElement>, val: FilterLevel) => {
-    setImgLevel(val);
-    debouncedSaveImgLevel(val);
+  const handleImgLevelChange = (
+    event: React.MouseEvent<HTMLElement>,
+    val: FilterLevel
+  ) => {
+    setGeneralImgLevel(val);
+    const forStorage: IStoredValues = { generalImgLevel: val };
+    chrome.storage.sync.set(forStorage);
   };
-  const handleIframeLevelChange = (event: React.MouseEvent<HTMLElement>, val: FilterLevel) => {
-    setIframeLevel(val);
-    debouncedSaveIframeLevel(val);
+  const handleIframeLevelChange = (
+    event: React.MouseEvent<HTMLElement>,
+    val: FilterLevel
+  ) => {
+    setGeneralIframeLevel(val);
+    const forStorage: IStoredValues = { generalIframeLevel: val };
+    chrome.storage.sync.set(forStorage);
   };
 
   return (
-    <>
-      <Typography variant="h6">Default Filters</Typography>
+    <Box sx={{ filter: `contrast(${disabled ? ".1" : "1"})` }}>
+      <Typography variant="subtitle1">Default Filters</Typography>
 
       <Grid container spacing={1} alignItems="center">
         <Grid item xs={2}>
-          <Typography variant="subtitle1">images</Typography>
+          <Typography variant="body2">images</Typography>
         </Grid>
         <Grid item xs={10}>
           <ToggleButtonGroup
+            size="small"
+            disabled={disabled}
             color="primary"
-            value={imgLevel}
+            value={generalImgLevel}
             exclusive
             onChange={handleImgLevelChange}
             aria-label="Image Filter Level"
@@ -91,9 +89,9 @@ const StandardFilterSettings = () => {
         </Grid>
         <Grid item xs={2}>
           <Stack direction="row" alignItems="center" spacing={0.5}>
-            <Typography variant="subtitle1">iframes</Typography>
+            <Typography variant="body2">iframes</Typography>
             <Tooltip title="Iframes are embedded websites often used for ads. Some sites also use iframes for regular content.">
-              <IconButton>
+              <IconButton size="small">
                 <InfoOutlinedIcon />
               </IconButton>
             </Tooltip>
@@ -101,8 +99,10 @@ const StandardFilterSettings = () => {
         </Grid>
         <Grid item xs={10}>
           <ToggleButtonGroup
+            size="small"
+            disabled={disabled}
             color="primary"
-            value={iframeLevel}
+            value={generalIframeLevel}
             exclusive
             onChange={handleIframeLevelChange}
             aria-label="Iframe Filter Level"
@@ -123,8 +123,8 @@ const StandardFilterSettings = () => {
           </ToggleButtonGroup>
         </Grid>
       </Grid>
-    </>
+    </Box>
   );
 };
 
-export default StandardFilterSettings;
+export default DefaultFilterSettings;
