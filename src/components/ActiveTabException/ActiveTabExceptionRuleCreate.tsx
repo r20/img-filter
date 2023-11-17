@@ -42,7 +42,7 @@ const ActiveTabExceptionRuleCreate = ({
   );
   return (
     <>
-      <Typography variant="subtitle1">Add Exception For Current Tab</Typography>
+      <Typography variant="subtitle2">Add Exception For Current Tab</Typography>
 
       <Grid container spacing={2} alignItems="center" sx={{ mb: 2 }}>
         <Grid item xs={2.5}>
@@ -57,7 +57,7 @@ const ActiveTabExceptionRuleCreate = ({
         <Grid item xs={3.5}>
           <TextField
             id={`matchString-${exceptionRule.idx}`}
-            label="string"
+            label="text"
             value={exceptionRule.matchString}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               const val = event.target.value;
@@ -68,6 +68,7 @@ const ActiveTabExceptionRuleCreate = ({
           />
         </Grid>
         <ExceptionRuleFilterEdit
+          xs={4}
           exceptionRule={exceptionRule}
           onImgLevelChange={(val) =>
             setExceptionRule({ ...exceptionRule, imgLevel: val })
@@ -76,7 +77,7 @@ const ActiveTabExceptionRuleCreate = ({
             setExceptionRule({ ...exceptionRule, iframeLevel: val })
           }
         />
-        <Grid item xs={1}>
+        <Grid item xs={1.5}>
           <Button
             size="small"
             variant="contained"

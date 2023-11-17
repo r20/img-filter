@@ -18,11 +18,18 @@ export interface IExceptionRule {
   iframeLevel: FilterLevel;
 }
 
-export interface IStoredValues {
+export interface IStoredDataOther {
   isEnabled?: boolean;
   generalImgLevel?: FilterLevel;
   generalIframeLevel?: FilterLevel;
-  exceptionRulesArray?: IExceptionRule[];
   lastExceptionImgLevelUsed?: FilterLevel;
   lastExceptionIframeLevelUsed?: FilterLevel;
 }
+export interface IStoredDataRules  {
+  /* If there's too much data within one key, we get this error: BYTES_PER_ITEM quota exceeded
+    so split it up into chunks */
+  exceptionRulesArray0to49?: IExceptionRule[];
+  exceptionRulesArray50to99?: IExceptionRule[];
+  exceptionRulesArray100to149?: IExceptionRule[];
+}
+

@@ -1,4 +1,4 @@
-import { FilterLevel, IStoredValues } from "./types";
+import { FilterLevel, IStoredDataRules, IStoredDataOther } from "./types";
 import { checkUrlEligibility, getMatchingRules } from "./utilities";
 
 const insertCss = (tabId: number, css: string) => {
@@ -90,11 +90,13 @@ interface IInsertedCssMap {
 let insertedCssMap: IInsertedCssMap = {};
 
 const setCss = (tab: chrome.tabs.Tab) => {
-  const defaults: IStoredValues = {
+  const defaults: IStoredDataRules & IStoredDataOther = {
     generalImgLevel: FilterLevel.Low,
     generalIframeLevel: FilterLevel.Medium,
     isEnabled: true,
-    exceptionRulesArray: [],
+    exceptionRulesArray0to49: [],
+    exceptionRulesArray50to99: [],
+    exceptionRulesArray100to149: [],
   };
 
   chrome.storage.sync.get(defaults, (items) => {
@@ -102,8 +104,16 @@ const setCss = (tab: chrome.tabs.Tab) => {
       generalImgLevel,
       generalIframeLevel,
       isEnabled,
-      exceptionRulesArray,
+      exceptionRulesArray0to49,
+      exceptionRulesArray50to99,
+      exceptionRulesArray100to149,
     } = items;
+
+    const exceptionRulesArray = [
+      ...exceptionRulesArray0to49,
+      ...exceptionRulesArray50to99,
+      ...exceptionRulesArray100to149,
+    ];
 
     console.log("jmr - isEnabled and tab", isEnabled, tab);
 
@@ -117,8 +127,14 @@ const setCss = (tab: chrome.tabs.Tab) => {
       const lastMatch = matchingRules.length
         ? matchingRules[matchingRules.length - 1]
         : null;
-      const imgLevel = lastMatch?.imgLevel || generalImgLevel;
-      const iframeLevel = lastMatch?.iframeLevel || generalIframeLevel;
+      const imgLevel =
+        lastMatch?.imgLevel !== undefined
+          ? lastMatch?.imgLevel
+          : generalImgLevel;
+      const iframeLevel =
+        lastMatch?.iframeLevel !== undefined
+          ? lastMatch?.iframeLevel
+          : generalIframeLevel;
 
       const newCss = buildCss(imgLevel, iframeLevel);
       const oldCss = insertedCssMap[tab.id] || "";
@@ -143,14 +159,14 @@ const setCss = (tab: chrome.tabs.Tab) => {
   });
 };
 
-// jmr - need to handle when reload a page
-
-// Handle when a tab is updated with a new url or reloaded
+/* Handle when a tab is updated with a new url or reloaded or status otherwise cahnges. */
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (tabId && tab.url && (changeInfo.url || changeInfo.status === "loading")) {
     console.log("jmr - onChange", tabId, tab, changeInfo);
-    // Wwen this happens the inserted css is no longer there. So remove it from the map.
-    delete insertedCssMap[tabId];
+    /* Call setCss which will try to remove old css 
+      (which is sometimes needed and sometimes not, such as a new URL).
+      It's OK if it tries to remove first and it wasn't needed.
+      Then it will add the new css. */
     setCss(tab);
   }
 });

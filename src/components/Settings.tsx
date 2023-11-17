@@ -7,9 +7,10 @@ import ActiveTabException from "./ActiveTabException";
 import { useActiveTabContext } from "../context/ActiveTabContext";
 import FilteringIsEnabled from "./FilteringIsEnabled";
 
+// jmr - width was 770
 const StyledDiv = styled.div`
-  width: 770px;
-  margin: 15px;
+  width: 760px;
+  padding: 15px;
   min-height: 280px;
   & > * {
     margin-top: 40px;
@@ -19,6 +20,8 @@ const StyledDiv = styled.div`
 const Settings = () => {
   const { activeTabMatchingRules } = useActiveTabContext();
 
+  /* jmr - If NOT on http/https I should maybe disable default filters and even (Enable Extension toggle)
+    and have a red message that no filtering is done for current tab */
   return (
     <StyledDiv>
       <FilteringIsEnabled />

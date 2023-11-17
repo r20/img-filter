@@ -1,6 +1,11 @@
 import React, { useState, useContext, useEffect } from "react";
 
-import { IExceptionRule, IStoredValues, FilterLevel } from "../types";
+import {
+  IExceptionRule,
+  IStoredDataOther,
+  IStoredDataRules,
+  FilterLevel,
+} from "../types";
 
 interface IExceptionRulesContext {
   lastExceptionImgLevelUsed: FilterLevel;
@@ -10,20 +15,18 @@ interface IExceptionRulesContext {
   onExceptionRuleEdit: (rule: IExceptionRule) => void;
   onExceptionRuleRemove: (rule: IExceptionRule) => void;
   onExceptionRuleRemoveAll: () => void;
+  isMaxExceptionsReached: boolean;
 }
 
-const defaultStoredValues = {
+const ExceptionRulesContext = React.createContext<IExceptionRulesContext>({
   lastExceptionImgLevelUsed: FilterLevel.None,
   lastExceptionIframeLevelUsed: FilterLevel.None,
   exceptionRulesArray: [],
-};
-
-const ExceptionRulesContext = React.createContext<IExceptionRulesContext>({
-  ...defaultStoredValues,
   onExceptionRuleAdd: (rule: IExceptionRule) => {},
   onExceptionRuleEdit: (rule: IExceptionRule) => {},
   onExceptionRuleRemove: (rule: IExceptionRule) => {},
   onExceptionRuleRemoveAll: () => {},
+  isMaxExceptionsReached: false,
 });
 
 interface IProps {
@@ -31,18 +34,37 @@ interface IProps {
 }
 const ExceptionRulesContextProvider = (props: IProps) => {
   const [lastExceptionImgLevelUsed, setLastExceptionImgLevelUsed] =
-    useState<FilterLevel>(defaultStoredValues.lastExceptionImgLevelUsed);
+    useState<FilterLevel>(FilterLevel.None);
   const [lastExceptionIframeLevelUsed, setLastExceptionIframeLevelUsed] =
-    useState<FilterLevel>(defaultStoredValues.lastExceptionIframeLevelUsed);
+    useState<FilterLevel>(FilterLevel.None);
   const [exceptionRulesArray, setExceptionRuleArray] = useState<
     IExceptionRule[]
-  >(defaultStoredValues.exceptionRulesArray);
+  >([]);
 
   useEffect(() => {
     // Restores preferences stored in chrome.storage.
-    chrome.storage.sync.get(defaultStoredValues, (items) => {
-      setExceptionRuleArray(items.exceptionRulesArray);
-    });
+    chrome.storage.sync.get(
+      {
+        lastExceptionImgLevelUsed: FilterLevel.None,
+        lastExceptionIframeLevelUsed: FilterLevel.None,
+        exceptionRulesArray0to49: [],
+        exceptionRulesArray50to99: [],
+        exceptionRulesArray100to149: [],
+      },
+      (items) => {
+        const exceptionRules = [
+          ...items.exceptionRulesArray0to49,
+          ...items.exceptionRulesArray50to99,
+          ...items.exceptionRulesArray100to149,
+        ];
+        setLastExceptionImgLevelUsed(items.lastExceptionImgLevelUsed);
+        setLastExceptionIframeLevelUsed(items.lastExceptionIframeLevelUsed);
+
+        setExceptionRuleArray(exceptionRules);
+        // For debug
+        // setExceptionRuleArray(generateMockRules());
+      }
+    );
   }, []);
 
   const saveValues = (
@@ -50,8 +72,10 @@ const ExceptionRulesContextProvider = (props: IProps) => {
     lastImgLevel: FilterLevel,
     lastIframeLevel: FilterLevel
   ) => {
-    const forStorage: IStoredValues = {
-      exceptionRulesArray: newVal,
+    const forStorage: IStoredDataOther & IStoredDataRules = {
+      exceptionRulesArray0to49: newVal.slice(0, 50),
+      exceptionRulesArray50to99: newVal.slice(50, 100),
+      exceptionRulesArray100to149: newVal.slice(100, 150),
       lastExceptionImgLevelUsed: lastImgLevel,
       lastExceptionIframeLevelUsed: lastIframeLevel,
     };
@@ -115,6 +139,8 @@ const ExceptionRulesContextProvider = (props: IProps) => {
     );
   };
 
+  const isMaxExceptionsReached = exceptionRulesArray.length >= 150;
+
   const val: IExceptionRulesContext = {
     lastExceptionImgLevelUsed,
     lastExceptionIframeLevelUsed,
@@ -123,6 +149,7 @@ const ExceptionRulesContextProvider = (props: IProps) => {
     onExceptionRuleEdit,
     onExceptionRuleRemove,
     onExceptionRuleRemoveAll,
+    isMaxExceptionsReached,
   };
   return <ExceptionRulesContext.Provider value={val} {...props} />;
 };

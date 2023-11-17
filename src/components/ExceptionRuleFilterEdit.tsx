@@ -11,15 +11,17 @@ interface IProps {
   exceptionRule: IExceptionRule;
   onImgLevelChange: (newVal: FilterLevel) => void;
   onIframeLevelChange: (newVal: FilterLevel) => void;
+  xs: number;
 }
 
 const ExceptionRuleFilterEdit = ({
   exceptionRule,
   onImgLevelChange,
   onIframeLevelChange,
+  xs,
 }: IProps) => {
   return (
-    <Grid item xs={4} container spacing={0.5} alignItems="center">
+    <Grid item xs={xs} container spacing={0.5} alignItems="center">
       <Grid item xs={3.5}>
         <Typography variant="body2">images</Typography>
       </Grid>

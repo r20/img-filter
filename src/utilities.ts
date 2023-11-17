@@ -1,4 +1,4 @@
-import { IExceptionRule, MatchType } from "./types";
+import { IExceptionRule, MatchType, FilterLevel } from "./types";
 
 /** Returns true if URL starts with http */
 export const checkUrlEligibility = (url: string | null | undefined) => {
@@ -18,7 +18,7 @@ export const getMatchingRules = (
           const withoutProtocol = currentUrl
             .replace("https://", "")
             .replace("http://", "");
-          console.log("jmr match info", withoutProtocol, matchString);
+
           if (withoutProtocol.startsWith(matchString)) {
             matchingExceptionRules.push(exceptionRulesArray[idx]);
           }
@@ -32,4 +32,19 @@ export const getMatchingRules = (
     }
   }
   return matchingExceptionRules;
+};
+
+const generateMockRules = () => {
+  const manyRules = [];
+  for (let idx = 0; idx < 50; idx++) {
+    const rule: IExceptionRule = {
+      imgLevel: FilterLevel.None,
+      iframeLevel: FilterLevel.None,
+      idx,
+      matchString: "example-website-" + idx,
+      matchType: MatchType.StartsWith,
+    };
+    manyRules.push(rule);
+  }
+  return manyRules;
 };

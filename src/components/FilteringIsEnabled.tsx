@@ -3,7 +3,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import Box from "@mui/material/Box";
 
-import { IStoredValues } from "../types";
+import { IStoredDataOther } from "../types";
 
 const FilteringIsEnabled = () => {
   const [isEnabled, setIsEnabled] = useState(true);
@@ -17,7 +17,7 @@ const FilteringIsEnabled = () => {
   }, []);
 
   const saveIsEnabled = (newIsEnabled: boolean) => {
-    const forStorage: IStoredValues = { isEnabled: newIsEnabled };
+    const forStorage: IStoredDataOther = { isEnabled: newIsEnabled };
     chrome.storage.sync.set(forStorage);
     setIsEnabled(newIsEnabled);
   };
@@ -33,7 +33,7 @@ const FilteringIsEnabled = () => {
             inputProps={{ "aria-label": "Is Enabled" }}
           />
         }
-        label="Enable Filtering"
+        label="Enable Extension"
       />
     </Box>
   );

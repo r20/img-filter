@@ -10,7 +10,7 @@ import Stack from "@mui/material/Stack";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 
-import { FilterLevel, IStoredValues } from "../types";
+import { FilterLevel, IStoredDataOther } from "../types";
 
 interface IProps {
   disabled: boolean;
@@ -26,7 +26,7 @@ const DefaultFilterSettings = ({ disabled }: IProps) => {
   );
 
   useEffect(() => {
-    const defaults: IStoredValues = {
+    const defaults: IStoredDataOther = {
       generalImgLevel: FilterLevel.Low,
       generalIframeLevel: FilterLevel.Medium,
     };
@@ -42,7 +42,7 @@ const DefaultFilterSettings = ({ disabled }: IProps) => {
     val: FilterLevel
   ) => {
     setGeneralImgLevel(val);
-    const forStorage: IStoredValues = { generalImgLevel: val };
+    const forStorage: IStoredDataOther = { generalImgLevel: val };
     chrome.storage.sync.set(forStorage);
   };
   const handleIframeLevelChange = (
@@ -50,13 +50,13 @@ const DefaultFilterSettings = ({ disabled }: IProps) => {
     val: FilterLevel
   ) => {
     setGeneralIframeLevel(val);
-    const forStorage: IStoredValues = { generalIframeLevel: val };
+    const forStorage: IStoredDataOther = { generalIframeLevel: val };
     chrome.storage.sync.set(forStorage);
   };
 
   return (
     <Box sx={{ filter: `contrast(${disabled ? ".1" : "1"})` }}>
-      <Typography variant="subtitle1">Default Filters</Typography>
+      <Typography variant="subtitle2">Default Filters</Typography>
 
       <Grid container spacing={1} alignItems="center">
         <Grid item xs={2}>

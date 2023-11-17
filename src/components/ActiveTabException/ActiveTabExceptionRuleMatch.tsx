@@ -16,7 +16,7 @@ const ActiveTabExceptionRuleMatch = () => {
 
   return lastMatch ? (
     <>
-      <Typography variant="subtitle1">Filters For Current Tab</Typography>
+      <Typography variant="subtitle2">Filters For Current Tab</Typography>
 
       <ExceptionRuleEdit
         exceptionRule={lastMatch}

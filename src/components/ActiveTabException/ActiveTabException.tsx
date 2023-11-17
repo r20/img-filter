@@ -11,13 +11,12 @@ import { useActiveTabContext } from "../../context/ActiveTabContext";
 const ActiveTabException = () => {
   const [isCreatingRule, setIsCreatingRule] = useState(false);
 
-  // jmr - there's no point in using useCallback because array changes everytime an item changes
-
   const {
     onExceptionRuleAdd,
     exceptionRulesArray,
     lastExceptionImgLevelUsed,
     lastExceptionIframeLevelUsed,
+    isMaxExceptionsReached,
   } = useExceptionRulesContext();
   const { activeEligibleHostname, activeTabMatchingRules } =
     useActiveTabContext();
@@ -51,7 +50,7 @@ const ActiveTabException = () => {
           onClick={() => {
             setIsCreatingRule(true);
           }}
-          disabled={!activeEligibleHostname}
+          disabled={!activeEligibleHostname || isMaxExceptionsReached}
         >
           Add Exception
           {activeEligibleHostname ? ` for ${activeEligibleHostname}` : ""}

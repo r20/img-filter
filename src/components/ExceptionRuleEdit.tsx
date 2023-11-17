@@ -18,8 +18,6 @@ const ExceptionRuleEdit = ({
   onExceptionRuleEdit,
   onExceptionRuleRemove,
 }: IProps) => {
-  console.log("jmr - rendering ExceptionRule", exceptionRule.idx);
-
   return (
     <Grid container spacing={2} alignItems="center" sx={{ mb: 2 }}>
       <Grid item xs={2.5}>
@@ -31,6 +29,7 @@ const ExceptionRuleEdit = ({
         </Typography>
       </Grid>
       <ExceptionRuleFilterEdit
+        xs={4}
         exceptionRule={exceptionRule}
         onImgLevelChange={(val) =>
           onExceptionRuleEdit({ ...exceptionRule, imgLevel: val })

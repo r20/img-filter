@@ -1,9 +1,10 @@
 import React, { useContext } from "react";
 
-import { IExceptionRule } from "../types";
+import {  IExceptionRule } from "../types";
 import useActiveTab from "../hooks/useActiveTab";
 import { getMatchingRules } from "../utilities";
 import { useExceptionRulesContext } from "./ExceptionRulesContext";
+
 
 /** activeTab has the chomre.tabs.Tab object of the current active tab, activeEligibleHostname and activeEligibleUrl.
  * The activeEligible* strings are the hostname and url if eligible for filtering (else they are empty string).  */

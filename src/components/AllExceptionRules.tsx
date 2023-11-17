@@ -18,7 +18,10 @@ const AllExceptionRules = () => {
     onExceptionRuleEdit,
     onExceptionRuleRemove,
     onExceptionRuleRemoveAll,
+    isMaxExceptionsReached,
   } = useExceptionRulesContext();
+
+  // jmr - need to test with 100s or 1000s of exceptions
 
   return exceptionRulesArray.length > 0 ? (
     <Box>
@@ -34,7 +37,15 @@ const AllExceptionRules = () => {
           id="panel1bh-header"
           sx={{ padding: 0 }}
         >
-          <Typography variant="subtitle1">All Exception Filters</Typography>
+          <Typography variant="subtitle2">All Exception Filters</Typography>
+          {isMaxExceptionsReached && (
+            <Typography
+              sx={{ color: "error.main", ml: "15px" }}
+              variant="subtitle2"
+            >
+              (Max Number Reached)
+            </Typography>
+          )}
         </AccordionSummary>
         <AccordionDetails sx={{ padding: 0 }}>
           <Grid container direction="column-reverse">
