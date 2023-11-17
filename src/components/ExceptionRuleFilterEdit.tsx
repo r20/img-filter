@@ -2,7 +2,6 @@ import React from "react";
 
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
-import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 
 import { FilterLevel, IExceptionRule } from "../types";
@@ -11,21 +10,26 @@ interface IProps {
   exceptionRule: IExceptionRule;
   onImgLevelChange: (newVal: FilterLevel) => void;
   onIframeLevelChange: (newVal: FilterLevel) => void;
-  xs: number;
 }
 
 const ExceptionRuleFilterEdit = ({
   exceptionRule,
   onImgLevelChange,
   onIframeLevelChange,
-  xs,
 }: IProps) => {
   return (
-    <Grid item xs={xs} container spacing={0.5} alignItems="center">
-      <Grid item xs={3.5}>
-        <Typography variant="body2">images</Typography>
-      </Grid>
-      <Grid item xs={8.5}>
+    <div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "15px",
+          marginBottom: "5px",
+        }}
+      >
+        <Typography variant="body2" width={50}>
+          images
+        </Typography>
         <ToggleButtonGroup
           size="small"
           color="primary"
@@ -35,7 +39,10 @@ const ExceptionRuleFilterEdit = ({
             event: React.MouseEvent<HTMLElement>,
             val: FilterLevel
           ) => {
-            onImgLevelChange(val);
+            if (val !== null) {
+              // Check for null to force one to be selected
+              onImgLevelChange(val);
+            }
           }}
           aria-label="Exception Rule Image Filter Level"
         >
@@ -44,12 +51,20 @@ const ExceptionRuleFilterEdit = ({
           <ToggleButton value={FilterLevel.Medium}>Med</ToggleButton>
           <ToggleButton value={FilterLevel.High}>Hi</ToggleButton>
         </ToggleButtonGroup>
-      </Grid>
+      </div>
 
-      <Grid item xs={3.5}>
-        <Typography variant="body2">iframes</Typography>
-      </Grid>
-      <Grid item xs={8.5}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "15px",
+          marginBottom: "5px",
+        }}
+      >
+        <Typography variant="body2" width={50}>
+          iframes
+        </Typography>
+
         <ToggleButtonGroup
           size="small"
           color="primary"
@@ -59,7 +74,10 @@ const ExceptionRuleFilterEdit = ({
             event: React.MouseEvent<HTMLElement>,
             val: FilterLevel
           ) => {
-            onIframeLevelChange(val);
+            if (val !== null) {
+              // Check for null to force one to be selected
+              onIframeLevelChange(val);
+            }
           }}
           aria-label="Exception Rule Iframe Filter Level"
         >
@@ -68,8 +86,8 @@ const ExceptionRuleFilterEdit = ({
           <ToggleButton value={FilterLevel.Medium}>Med</ToggleButton>
           <ToggleButton value={FilterLevel.High}>Hi</ToggleButton>
         </ToggleButtonGroup>
-      </Grid>
-    </Grid>
+      </div>
+    </div>
   );
 };
 

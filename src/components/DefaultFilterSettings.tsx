@@ -41,17 +41,23 @@ const DefaultFilterSettings = ({ disabled }: IProps) => {
     event: React.MouseEvent<HTMLElement>,
     val: FilterLevel
   ) => {
-    setGeneralImgLevel(val);
-    const forStorage: IStoredDataOther = { generalImgLevel: val };
-    chrome.storage.sync.set(forStorage);
+    if (val !== null) {
+      // Check for null to force one to be selected
+      setGeneralImgLevel(val);
+      const forStorage: IStoredDataOther = { generalImgLevel: val };
+      chrome.storage.sync.set(forStorage);
+    }
   };
   const handleIframeLevelChange = (
     event: React.MouseEvent<HTMLElement>,
     val: FilterLevel
   ) => {
-    setGeneralIframeLevel(val);
-    const forStorage: IStoredDataOther = { generalIframeLevel: val };
-    chrome.storage.sync.set(forStorage);
+    if (val !== null) {
+      // Check for null to force one to be selected
+      setGeneralIframeLevel(val);
+      const forStorage: IStoredDataOther = { generalIframeLevel: val };
+      chrome.storage.sync.set(forStorage);
+    }
   };
 
   return (

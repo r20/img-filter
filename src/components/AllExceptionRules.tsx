@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
@@ -48,19 +47,19 @@ const AllExceptionRules = () => {
           )}
         </AccordionSummary>
         <AccordionDetails sx={{ padding: 0 }}>
-          <Grid container direction="column-reverse">
-            {exceptionRulesArray.map((exceptionRule) => {
+          {exceptionRulesArray
+            .map((exceptionRule) => {
               return (
-                <Grid item xs={12}>
-                  <ExceptionRuleEdit
-                    exceptionRule={exceptionRule}
-                    onExceptionRuleEdit={onExceptionRuleEdit}
-                    onExceptionRuleRemove={onExceptionRuleRemove}
-                  />
-                </Grid>
+                <ExceptionRuleEdit
+                  exceptionRule={exceptionRule}
+                  onExceptionRuleEdit={onExceptionRuleEdit}
+                  onExceptionRuleRemove={onExceptionRuleRemove}
+                />
               );
-            })}
-          </Grid>
+              // Call reverse AFTER map because it's ok to modify the new map array but we don't want to modify the original
+            })
+            .reverse()}
+
           <Box
             display="flex"
             flexDirection="column"
