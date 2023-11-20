@@ -1,4 +1,4 @@
-import { IExceptionRule, MatchType, FilterLevel } from "./types";
+import { ICustomRule, MatchType, FilterLevel } from "./types";
 
 /** Returns true if URL starts with http */
 export const checkUrlEligibility = (url: string | null | undefined) => {
@@ -7,12 +7,12 @@ export const checkUrlEligibility = (url: string | null | undefined) => {
 
 export const getMatchingRules = (
   currentUrl: string,
-  exceptionRulesArray: IExceptionRule[]
-): IExceptionRule[] => {
-  let matchingExceptionRules = [];
+  customRulesArray: ICustomRule[]
+): ICustomRule[] => {
+  let matchingCustomRules = [];
   if (currentUrl) {
-    for (let idx = 0; idx < exceptionRulesArray.length; idx++) {
-      const { matchString, matchType } = exceptionRulesArray[idx];
+    for (let idx = 0; idx < customRulesArray.length; idx++) {
+      const { matchString, matchType } = customRulesArray[idx];
       if (matchString) {
         if (matchType === MatchType.StartsWith) {
           const withoutProtocol = currentUrl
@@ -20,24 +20,24 @@ export const getMatchingRules = (
             .replace("http://", "");
 
           if (withoutProtocol.startsWith(matchString)) {
-            matchingExceptionRules.push(exceptionRulesArray[idx]);
+            matchingCustomRules.push(customRulesArray[idx]);
           }
         } else {
           // This is MatchType.Contains
           if (currentUrl.indexOf(matchString) >= 0) {
-            matchingExceptionRules.push(exceptionRulesArray[idx]);
+            matchingCustomRules.push(customRulesArray[idx]);
           }
         }
       }
     }
   }
-  return matchingExceptionRules;
+  return matchingCustomRules;
 };
 
 const generateMockRules = () => {
   const manyRules = [];
   for (let idx = 0; idx < 50; idx++) {
-    const rule: IExceptionRule = {
+    const rule: ICustomRule = {
       imgLevel: FilterLevel.None,
       iframeLevel: FilterLevel.None,
       idx,

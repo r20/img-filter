@@ -10,7 +10,7 @@ const insertCss = (tabId: number, css: string) => {
           // allFrames: true, // jmr - inject in to all frames within the tab (maybe don't need to obscure iframe if this works)
         },
         css: css,
-        origin: "USER", // jmr - should we do USER?
+        origin: "USER",
       },
       () => {
         // do nothing
@@ -35,7 +35,7 @@ const removeCss = (tabId: number, css: string) => {
         // allFrames: true, // jmr - inject in to all frames within the tab (maybe don't need to obscure iframe if this works)
       },
       css: css,
-      origin: "USER", // jmr - should we do USER?
+      origin: "USER",
     });
   } catch (err) {
     console.log(
@@ -94,9 +94,9 @@ const setCss = (tab: chrome.tabs.Tab) => {
     generalImgLevel: FilterLevel.Low,
     generalIframeLevel: FilterLevel.Medium,
     isEnabled: true,
-    exceptionRulesArray0to49: [],
-    exceptionRulesArray50to99: [],
-    exceptionRulesArray100to149: [],
+    customRulesArray0to49: [],
+    customRulesArray50to99: [],
+    customRulesArray100to149: [],
   };
 
   chrome.storage.sync.get(defaults, (items) => {
@@ -104,23 +104,21 @@ const setCss = (tab: chrome.tabs.Tab) => {
       generalImgLevel,
       generalIframeLevel,
       isEnabled,
-      exceptionRulesArray0to49,
-      exceptionRulesArray50to99,
-      exceptionRulesArray100to149,
+      customRulesArray0to49,
+      customRulesArray50to99,
+      customRulesArray100to149,
     } = items;
 
-    const exceptionRulesArray = [
-      ...exceptionRulesArray0to49,
-      ...exceptionRulesArray50to99,
-      ...exceptionRulesArray100to149,
+    const customRulesArray = [
+      ...customRulesArray0to49,
+      ...customRulesArray50to99,
+      ...customRulesArray100to149,
     ];
-
-    console.log("jmr - isEnabled and tab", isEnabled, tab);
 
     if (tab && tab.id && checkUrlEligibility(tab.url)) {
       const matchingRules = getMatchingRules(
         tab.url as string,
-        exceptionRulesArray
+        customRulesArray
       );
 
       /* Use the last matching rule.  That's how they are displayed to users too. */
@@ -138,21 +136,20 @@ const setCss = (tab: chrome.tabs.Tab) => {
 
       const newCss = buildCss(imgLevel, iframeLevel);
       const oldCss = insertedCssMap[tab.id] || "";
-      // console.log("jmr - new and old css", newCss, oldCss);
 
-      if (oldCss && (newCss !== oldCss || !isEnabled)) {
-        // There's old, and it's either changed or turned off
-        // Don't bother waiting for remove (which is an async operation). I think it's ok to add other css before remove is finished.
-        console.log("jmr - removing oldCss", oldCss, tab);
+      if (oldCss) {
+        /* If there's old remove it. Don't bother waiting for remove (which is an async operation).
+          I think it's ok to add other css before remove is finished. */
         removeCss(tab.id, oldCss);
         delete insertedCssMap[tab.id];
       }
 
-      if (isEnabled && newCss !== oldCss) {
-        // It's on and it's not already set
-        console.log("jmr - inserting newCss", newCss, tab);
+      if (isEnabled) {
+        /* It's on add it. I used to try to not remove and re-add if css is the same,
+          but there were times when a page was loading and it'd get set then somehow disappear from the page after
+          an onChange event for loading and it'd need set again.
+          (This happened when refreshing stackoverfow sites.) */
         insertCss(tab.id, newCss);
-
         insertedCssMap[tab.id] = newCss;
       }
     }
@@ -162,7 +159,6 @@ const setCss = (tab: chrome.tabs.Tab) => {
 /* Handle when a tab is updated with a new url or reloaded or status otherwise cahnges. */
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (tabId && tab.url && (changeInfo.url || changeInfo.status === "loading")) {
-    console.log("jmr - onChange", tabId, tab, changeInfo);
     /* Call setCss which will try to remove old css 
       (which is sometimes needed and sometimes not, such as a new URL).
       It's OK if it tries to remove first and it wasn't needed.
@@ -181,9 +177,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
 
 // Handle when the active tab changes
 chrome.tabs.onActivated.addListener((activeInfo) => {
-  console.log("jmr - onActivated", activeInfo);
   chrome.tabs.get(activeInfo.tabId, (tab) => {
-    console.log("jmr - active tab", tab);
     setCss(tab);
   });
 });
@@ -205,3 +199,5 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
     });
   }
 });
+
+// jmr - consider using chrome.action.setIcon to change the icon to show whether filtering is on or off (maybe also eligble or not eligible)

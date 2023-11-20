@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import Box from "@mui/material/Box";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import IconButton from "@mui/material/IconButton";
+import Tooltip from "@mui/material/Tooltip";
 
 import { IStoredDataOther } from "../types";
 
@@ -23,9 +26,8 @@ const FilteringIsEnabled = () => {
   };
 
   return (
-    <Box display="flex" flexDirection="column" justifyContent="center">
+    <Box display="flex" flexDirection="row" alignItems="center">
       <FormControlLabel
-        sx={{ mr: "0" }}
         control={
           <Switch
             checked={isEnabled}
@@ -35,6 +37,11 @@ const FilteringIsEnabled = () => {
         }
         label="Enable Extension"
       />
+      <Tooltip title="Filter images and iframes. Iframes are embedded websites often used for ads, though some sites also use iframes for regular content.">
+        <IconButton size="small">
+          <InfoOutlinedIcon />
+        </IconButton>
+      </Tooltip>
     </Box>
   );
 };

@@ -4,7 +4,9 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
+
 import { MatchType } from "../types";
+
 interface IProps {
   idPrefix: string;
   selectedValue: MatchType;
@@ -19,7 +21,7 @@ const MatchTypeSelect = ({ idPrefix, selectedValue, onSelection }: IProps) => {
   const val = selectedValue as unknown as string;
   return (
     <Box sx={{ minWidth: 120 }}>
-      <FormControl fullWidth size="small">
+      <FormControl fullWidth size="small" variant="standard">
         <InputLabel id={`${idPrefix}-host-match-type-select-label`}>
           should
         </InputLabel>

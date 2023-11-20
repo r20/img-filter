@@ -14,12 +14,6 @@ const useActiveTab = () => {
     activeEligibleHostname = urlObj.hostname;
   }
 
-  console.log(
-    "jmr - activeEligibleHostname",
-    activeEligibleHostname,
-    activeTab
-  );
-
   // For simplicity use the same function for both listeners that doesn't take any arguments. The listener signature has args and it'll be passed args but ignore them.
   const queryActiveTab = useCallback(() => {
     (async () => {

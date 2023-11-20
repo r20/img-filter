@@ -10,7 +10,7 @@ export enum MatchType {
   StartsWith = "Starts with",
 }
 
-export interface IExceptionRule {
+export interface ICustomRule {
   idx: number;
   matchType: MatchType;
   matchString: string;
@@ -22,14 +22,13 @@ export interface IStoredDataOther {
   isEnabled?: boolean;
   generalImgLevel?: FilterLevel;
   generalIframeLevel?: FilterLevel;
-  lastExceptionImgLevelUsed?: FilterLevel;
-  lastExceptionIframeLevelUsed?: FilterLevel;
+  lastCustomImgLevelUsed?: FilterLevel;
+  lastCustomIframeLevelUsed?: FilterLevel;
 }
-export interface IStoredDataRules  {
+export interface IStoredDataRules {
   /* If there's too much data within one key, we get this error: BYTES_PER_ITEM quota exceeded
     so split it up into chunks */
-  exceptionRulesArray0to49?: IExceptionRule[];
-  exceptionRulesArray50to99?: IExceptionRule[];
-  exceptionRulesArray100to149?: IExceptionRule[];
+  customRulesArray0to49?: ICustomRule[];
+  customRulesArray50to99?: ICustomRule[];
+  customRulesArray100to149?: ICustomRule[];
 }
-

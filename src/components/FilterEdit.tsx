@@ -4,16 +4,19 @@ import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Typography from "@mui/material/Typography";
 
-import { FilterLevel, IExceptionRule } from "../types";
+import { FilterLevel } from "../types";
 
 interface IProps {
-  exceptionRule: IExceptionRule;
+  imgLevel: FilterLevel;
+  iframeLevel: FilterLevel;
   onImgLevelChange: (newVal: FilterLevel) => void;
   onIframeLevelChange: (newVal: FilterLevel) => void;
 }
 
-const ExceptionRuleFilterEdit = ({
-  exceptionRule,
+/* This shows the image and iframe levels and allows editing */
+const FilterEdit = ({
+  imgLevel,
+  iframeLevel,
   onImgLevelChange,
   onIframeLevelChange,
 }: IProps) => {
@@ -33,7 +36,7 @@ const ExceptionRuleFilterEdit = ({
         <ToggleButtonGroup
           size="small"
           color="primary"
-          value={exceptionRule.imgLevel}
+          value={imgLevel}
           exclusive
           onChange={(
             event: React.MouseEvent<HTMLElement>,
@@ -44,12 +47,12 @@ const ExceptionRuleFilterEdit = ({
               onImgLevelChange(val);
             }
           }}
-          aria-label="Exception Rule Image Filter Level"
+          aria-label="Custom Rule Image Filter Level"
         >
-          <ToggleButton value={FilterLevel.None}>No</ToggleButton>
-          <ToggleButton value={FilterLevel.Low}>Lo</ToggleButton>
+          <ToggleButton value={FilterLevel.None}>Off</ToggleButton>
+          <ToggleButton value={FilterLevel.Low}>Low</ToggleButton>
           <ToggleButton value={FilterLevel.Medium}>Med</ToggleButton>
-          <ToggleButton value={FilterLevel.High}>Hi</ToggleButton>
+          <ToggleButton value={FilterLevel.High}>High</ToggleButton>
         </ToggleButtonGroup>
       </div>
 
@@ -58,7 +61,8 @@ const ExceptionRuleFilterEdit = ({
           display: "flex",
           alignItems: "center",
           gap: "15px",
-          marginBottom: "5px",
+          marginTop: "2px",
+          marginBottom: "2px",
         }}
       >
         <Typography variant="body2" width={50}>
@@ -68,7 +72,7 @@ const ExceptionRuleFilterEdit = ({
         <ToggleButtonGroup
           size="small"
           color="primary"
-          value={exceptionRule.iframeLevel}
+          value={iframeLevel}
           exclusive
           onChange={(
             event: React.MouseEvent<HTMLElement>,
@@ -79,16 +83,16 @@ const ExceptionRuleFilterEdit = ({
               onIframeLevelChange(val);
             }
           }}
-          aria-label="Exception Rule Iframe Filter Level"
+          aria-label="Custom Rule Iframe Filter Level"
         >
-          <ToggleButton value={FilterLevel.None}>No</ToggleButton>
-          <ToggleButton value={FilterLevel.Low}>Lo</ToggleButton>
+          <ToggleButton value={FilterLevel.None}>Off</ToggleButton>
+          <ToggleButton value={FilterLevel.Low}>Low</ToggleButton>
           <ToggleButton value={FilterLevel.Medium}>Med</ToggleButton>
-          <ToggleButton value={FilterLevel.High}>Hi</ToggleButton>
+          <ToggleButton value={FilterLevel.High}>High</ToggleButton>
         </ToggleButtonGroup>
       </div>
     </div>
   );
 };
 
-export default ExceptionRuleFilterEdit;
+export default FilterEdit;

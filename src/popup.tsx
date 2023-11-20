@@ -8,18 +8,18 @@ import "@fontsource/roboto/700.css";
 
 import Settings from "./components/Settings";
 
-import { ExceptionRulesContextProvider } from "./context/ExceptionRulesContext";
+import { CustomRulesContextProvider } from "./context/CustomRulesContext";
 import { ActiveTabContextProvider } from "./context/ActiveTabContext";
 
 const root = createRoot(document.getElementById("root")!);
 
 root.render(
   <React.StrictMode>
-    <ExceptionRulesContextProvider>
+    <CustomRulesContextProvider>
       <ActiveTabContextProvider>
         <Settings />
       </ActiveTabContextProvider>
-    </ExceptionRulesContextProvider>
+    </CustomRulesContextProvider>
   </React.StrictMode>
 );
 

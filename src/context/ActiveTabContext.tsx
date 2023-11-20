@@ -1,18 +1,20 @@
 import React, { useContext } from "react";
 
-import {  IExceptionRule } from "../types";
+import { ICustomRule } from "../types";
 import useActiveTab from "../hooks/useActiveTab";
 import { getMatchingRules } from "../utilities";
-import { useExceptionRulesContext } from "./ExceptionRulesContext";
+import { useCustomRulesContext } from "./CustomRulesContext";
 
-
-/** activeTab has the chomre.tabs.Tab object of the current active tab, activeEligibleHostname and activeEligibleUrl.
- * The activeEligible* strings are the hostname and url if eligible for filtering (else they are empty string).  */
+/** activeTab has the chomre.tabs.Tab object of the current active tab.
+ * activeEligibleHostname and activeEligibleUrl strings are the hostname and url if eligible for filtering (else they are empty string).
+ * activeTabMatchingRules are all rules that match the current tab.
+ * activeTabCustomRule is the rule in effect (the last item in activeTabMatchingRules) */
 interface IActiveTabContext {
   activeTab: chrome.tabs.Tab | null;
   activeEligibleHostname: string;
   activeEligibleUrl: string;
-  activeTabMatchingRules: IExceptionRule[];
+  activeTabMatchingRules: ICustomRule[];
+  activeTabCustomRule: ICustomRule | null; // The actual matching rule that's in effect
 }
 
 const ActiveTabContext = React.createContext<IActiveTabContext>({
@@ -20,6 +22,7 @@ const ActiveTabContext = React.createContext<IActiveTabContext>({
   activeEligibleHostname: "",
   activeEligibleUrl: "",
   activeTabMatchingRules: [],
+  activeTabCustomRule: null,
 });
 
 interface IProps {
@@ -29,17 +32,22 @@ const ActiveTabContextProvider = (props: IProps) => {
   const { activeTab, activeEligibleHostname, activeEligibleUrl } =
     useActiveTab();
 
-  const { exceptionRulesArray } = useExceptionRulesContext();
+  const { customRulesArray } = useCustomRulesContext();
   const activeTabMatchingRules = getMatchingRules(
     activeEligibleUrl,
-    exceptionRulesArray
+    customRulesArray
   );
+
+  const activeTabCustomRule = activeTabMatchingRules.length
+    ? activeTabMatchingRules[activeTabMatchingRules.length - 1]
+    : null;
 
   const val = {
     activeTab,
     activeEligibleHostname,
     activeEligibleUrl,
     activeTabMatchingRules,
+    activeTabCustomRule,
   };
   return <ActiveTabContext.Provider value={val} {...props} />;
 };
