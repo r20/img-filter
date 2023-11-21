@@ -167,7 +167,7 @@ const setCss = (tab: chrome.tabs.Tab) => {
   });
 };
 
-/* Handle when a tab is updated with a new url or reloaded or status otherwise cahnges. */
+/* Handle when a tab is updated with a new url or reloaded or status otherwise changes. */
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (tabId && tab.url && (changeInfo.url || changeInfo.status === "loading")) {
     /* Call setCss which will try to remove old css 
@@ -196,12 +196,12 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
 // Handle when the settings in storage change
 chrome.storage.onChanged.addListener((changes, namespace) => {
   if (namespace === "sync") {
-    for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
-      console.log(
-        `Storage key "${key}" in namespace "${namespace}" changed.`,
-        `Old value was "${oldValue}", new value is "${newValue}".`
-      );
-    }
+    // for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
+    //   console.log(
+    //     `Storage key "${key}" in namespace "${namespace}" changed.`,
+    //     `Old value was "${oldValue}", new value is "${newValue}".`
+    //   );
+    // }
 
     chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
       // since only one tab should be active and in the current window at once the return variable should only have one entry
