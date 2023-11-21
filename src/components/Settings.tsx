@@ -1,93 +1,104 @@
-// Saves options to chrome.storage
-// const saveOptions = () => {
-//   const color = (document.getElementById("color") as HTMLSelectElement).value;
-//   const likesColor = (document?.getElementById("like") as HTMLInputElement).checked;
+import React from "react";
+import styled from "@emotion/styled";
+import Typography from "@mui/material/Typography";
 
-//   chrome.storage.sync.set({ favoriteColor: color, likesColor: likesColor }, () => {
-//     // Update status to let user know options were saved.
-//     const status = document.getElementById("status") as HTMLDivElement;
-//     status.textContent = "Options saved.";
-//     setTimeout(() => {
-//       status.textContent = "";
-//     }, 750);
-//   });
-// };
+import { useActiveTabContext } from "../context/ActiveTabContext";
+import FilteringIsEnabled from "./FilteringIsEnabled";
+import ActiveFilter from "./ActiveFilter";
+import FilterCreate from "./FilterCreate";
+import OtherFilters from "./OtherFilters";
+import { useCustomRulesContext } from "../context/CustomRulesContext";
+import { MatchType } from "../types";
+import { filterCreateHeight } from "./FilterCreate";
 
-// // Restores select box and checkbox state using the preferences
-// // stored in chrome.storage.
-// const restoreOptions = () => {
-//   chrome.storage.sync.get({ favoriteColor: "red", likesColor: true }, (items) => {
-//     (document.getElementById("color") as HTMLSelectElement).value = items.favoriteColor;
-//     (document.getElementById("like") as HTMLInputElement).checked = items.likesColor;
-//   });
-// };
+const StyledDiv = styled.div`
+  width: 760px;
+  padding: 15px;
+  min-height: 250px;
+  & > * {
+    margin-top: 40px;
+  }
+  & > *:first-child {
+    margin-top: 25px;
+  }
+  & > *:last-child {
+    margin-bottom: 25px;
+  }
+`;
 
-// document.addEventListener("DOMContentLoaded", restoreOptions);
-// (document.getElementById("save") as HTMLButtonElement).addEventListener("click", saveOptions);
-
-import React, { useEffect, useState } from "react";
-import { MDBSwitch } from "mdb-react-ui-kit";
-import FilterSettings from "./FilterSettings";
-
-interface ISiteNotFiltered {
-  host: string;
-  img: boolean;
-  iframe: boolean;
-}
 const Settings = () => {
-  const [isEnabled, setIsEnabled] = useState<boolean>(true);
-
-  const [sitesNotFiltered, setSitesNotFiltered] = useState<ISiteNotFiltered[]>([]);
-
-  useEffect(() => {
-    // Restores preferences stored in chrome.storage.
-    chrome.storage.sync.get(
-      {
-        isEnabled: true,
-
-        sitesNotFiltered: [],
-      },
-      (items) => {
-        setIsEnabled(items.isEnabled);
-
-        setSitesNotFiltered(items.sitesNotFiltered);
-      }
-    );
-  }, []);
-
-  const saveIsEnabled = (newIsEnabled: boolean) => {
-    chrome.storage.sync.set({ isEnabled: newIsEnabled });
-    setIsEnabled(newIsEnabled);
-  };
-
-  const addSiteNotFiltered = (newSite: ISiteNotFiltered) => {
-    const withoutHost = sitesNotFiltered.filter((item: ISiteNotFiltered) => {
-      item.host !== newSite.host;
-    });
-    const newSitesNotFiltered = [...withoutHost, newSite];
-    chrome.storage.sync.set({ sitesNotFiltered: newSitesNotFiltered });
-    setSitesNotFiltered(newSitesNotFiltered);
-  };
-
-  const removeSiteNotFiltered = (siteToRemove: ISiteNotFiltered) => {
-    const withoutHost = sitesNotFiltered.filter((item: ISiteNotFiltered) => {
-      item.host !== siteToRemove.host;
-    });
-    chrome.storage.sync.set({ sitesNotFiltered: withoutHost });
-    setSitesNotFiltered(withoutHost);
-  };
+  const { activeEligibleHostname, activeTabCustomRule } = useActiveTabContext();
+  const {
+    customRulesArray,
+    lastCustomImgLevelUsed,
+    lastCustomIframeLevelUsed,
+    onCustomRuleAdd,
+    isMaxRulesReached,
+  } = useCustomRulesContext();
 
   return (
-    <div style={{ width: "400px", padding: "20px" }}>
-      <MDBSwitch
-        id="isEnabled"
-        label="Enable"
-        checked={isEnabled}
-        onChange={(evt) => saveIsEnabled(evt.target.checked)}
+    <StyledDiv>
+      <FilteringIsEnabled />
+      {activeEligibleHostname ? (
+        <>
+          <ActiveFilter />
+          {isMaxRulesReached ? (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                minHeight: filterCreateHeight,
+              }}
+            >
+              <Typography
+                variant="subtitle1"
+                color="main.error"
+                sx={{ fontWeight: "light" }}
+              >
+                Maximum number of custom rules reached.
+              </Typography>
+            </div>
+          ) : (
+            <FilterCreate
+              initialCustomRule={{
+                matchType: MatchType.StartsWith,
+                // New idx at end of array
+                idx: customRulesArray.length,
+                matchString: activeEligibleHostname,
+                imgLevel: lastCustomImgLevelUsed,
+                iframeLevel: lastCustomIframeLevelUsed,
+              }}
+              onSave={(newRule) => {
+                onCustomRuleAdd(newRule);
+              }}
+            />
+          )}
+        </>
+      ) : (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            marginTop: "50px",
+            marginBottom: "50px",
+          }}
+        >
+          <Typography
+            variant="subtitle1"
+            color="main.secondary"
+            sx={{ fontWeight: "light" }}
+          >
+            This page is not eligible for filtering.
+          </Typography>
+        </div>
+      )}
+      <OtherFilters
+        showDefaultFilter={!!(activeTabCustomRule || !activeEligibleHostname)}
       />
-      <br />
-      <FilterSettings />
-    </div>
+    </StyledDiv>
   );
 };
 
