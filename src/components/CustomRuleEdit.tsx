@@ -12,12 +12,8 @@ interface IProps {
   onCustomRuleRemove: (CustomRule: ICustomRule) => void;
 }
 
-/* This shows a custom rule filter (not default) and allows editing. */
-const CustomRuleEdit = ({
-  customRule,
-  onCustomRuleEdit,
-  onCustomRuleRemove,
-}: IProps) => {
+/* This shows a custom rule filter (not default) and allows editing that filter. */
+const CustomRuleEdit = ({ customRule, onCustomRuleEdit, onCustomRuleRemove }: IProps) => {
   return (
     <div
       style={{
@@ -37,12 +33,8 @@ const CustomRuleEdit = ({
       <FilterEdit
         imgLevel={customRule.imgLevel}
         iframeLevel={customRule.iframeLevel}
-        onImgLevelChange={(val) =>
-          onCustomRuleEdit({ ...customRule, imgLevel: val })
-        }
-        onIframeLevelChange={(val) =>
-          onCustomRuleEdit({ ...customRule, iframeLevel: val })
-        }
+        onImgLevelChange={(val) => onCustomRuleEdit({ ...customRule, imgLevel: val })}
+        onIframeLevelChange={(val) => onCustomRuleEdit({ ...customRule, iframeLevel: val })}
       />
 
       <IconButton onClick={() => onCustomRuleRemove(customRule)}>

@@ -14,12 +14,7 @@ interface IProps {
 }
 
 /* This shows the image and iframe levels and allows editing */
-const FilterEdit = ({
-  imgLevel,
-  iframeLevel,
-  onImgLevelChange,
-  onIframeLevelChange,
-}: IProps) => {
+const FilterEdit = ({ imgLevel, iframeLevel, onImgLevelChange, onIframeLevelChange }: IProps) => {
   return (
     <div>
       <div
@@ -38,10 +33,7 @@ const FilterEdit = ({
           color="primary"
           value={imgLevel}
           exclusive
-          onChange={(
-            event: React.MouseEvent<HTMLElement>,
-            val: FilterLevel
-          ) => {
+          onChange={(event: React.MouseEvent<HTMLElement>, val: FilterLevel) => {
             if (val !== null) {
               // Check for null to force one to be selected
               onImgLevelChange(val);
@@ -53,6 +45,7 @@ const FilterEdit = ({
           <ToggleButton value={FilterLevel.Low}>Low</ToggleButton>
           <ToggleButton value={FilterLevel.Medium}>Med</ToggleButton>
           <ToggleButton value={FilterLevel.High}>High</ToggleButton>
+          <ToggleButton value={FilterLevel.Full}>Full</ToggleButton>
         </ToggleButtonGroup>
       </div>
 
@@ -74,10 +67,7 @@ const FilterEdit = ({
           color="primary"
           value={iframeLevel}
           exclusive
-          onChange={(
-            event: React.MouseEvent<HTMLElement>,
-            val: FilterLevel
-          ) => {
+          onChange={(event: React.MouseEvent<HTMLElement>, val: FilterLevel) => {
             if (val !== null) {
               // Check for null to force one to be selected
               onIframeLevelChange(val);
@@ -89,6 +79,7 @@ const FilterEdit = ({
           <ToggleButton value={FilterLevel.Low}>Low</ToggleButton>
           <ToggleButton value={FilterLevel.Medium}>Med</ToggleButton>
           <ToggleButton value={FilterLevel.High}>High</ToggleButton>
+          <ToggleButton value={FilterLevel.Full}>Full</ToggleButton>
         </ToggleButtonGroup>
       </div>
     </div>

@@ -1,7 +1,7 @@
 {
   "name": "img-filter",
-  "version": "1.0.0",
-  "description": "Reduce distraction by applying filters to iframes (which often serve ads) and images. Control filter levels per site.",
+  "version": "1.0.1",
+  "description": "Reduce distraction by applying filters to iframes (which often serve ads) and images.",
   "main": "index.js",
   "scripts": {
     "watch": "webpack --config webpack/webpack.dev.js --watch",

@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Reduce Ad and Image Distraction",
-  "description": "Reduce distraction by applying filters to iframes (which often serve ads) and images with low CPU and memory impact. Control filtering per website.",
-  "version": "1.0.0",
+  "description": "Apply filters to iframes (which often serve ads) and images. Allows custom filtering per website. Low CPU and memory impact.",
+  "version": "1.0.1",
   "icons": {
     "16": "images/icon-16.png",
     "32": "images/icon-32.png",

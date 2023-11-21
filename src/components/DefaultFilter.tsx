@@ -7,17 +7,13 @@ import FilterEdit from "./FilterEdit";
 
 /* These setting apply to all sites that don't have custom rules */
 const DefaultFilter = () => {
-  const [generalImgLevel, setGeneralImgLevel] = useState<FilterLevel>(
-    FilterLevel.Low
-  );
-  const [generalIframeLevel, setGeneralIframeLevel] = useState<FilterLevel>(
-    FilterLevel.Medium
-  );
+  const [generalImgLevel, setGeneralImgLevel] = useState<FilterLevel>(FilterLevel.Low);
+  const [generalIframeLevel, setGeneralIframeLevel] = useState<FilterLevel>(FilterLevel.High);
 
   useEffect(() => {
     const defaults: IStoredDataOther = {
       generalImgLevel: FilterLevel.Low,
-      generalIframeLevel: FilterLevel.Medium,
+      generalIframeLevel: FilterLevel.High,
     };
     // Restores preferences stored in chrome.storage.
     chrome.storage.sync.get(defaults, (items) => {

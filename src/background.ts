@@ -7,7 +7,7 @@ const insertCss = (tabId: number, css: string) => {
       {
         target: {
           tabId: tabId,
-          // allFrames: true, // jmr - inject in to all frames within the tab (maybe don't need to obscure iframe if this works)
+          allFrames: true, // inject in to all frames within the tab (including iframes)
         },
         css: css,
         origin: "USER",
@@ -17,12 +17,7 @@ const insertCss = (tabId: number, css: string) => {
       }
     );
   } catch (err) {
-    console.log(
-      "There was an error inserting css for tabId",
-      tabId,
-      "and css",
-      css
-    );
+    console.log("There was an error inserting css for tabId", tabId, "and css", css);
     return Promise.resolve();
   }
 };
@@ -32,18 +27,13 @@ const removeCss = (tabId: number, css: string) => {
     return chrome.scripting.removeCSS({
       target: {
         tabId: tabId,
-        // allFrames: true, // jmr - inject in to all frames within the tab (maybe don't need to obscure iframe if this works)
+        allFrames: true, // inject in to all frames within the tab (including iframes)
       },
       css: css,
       origin: "USER",
     });
   } catch (err) {
-    console.log(
-      "There was an error removing css for tabId",
-      tabId,
-      "and css",
-      css
-    );
+    console.log("There was an error removing css for tabId", tabId, "and css", css);
     return Promise.resolve();
   }
 };
@@ -57,6 +47,9 @@ const buildCss = (imgLevel: FilterLevel, iframeLevel: FilterLevel) => {
     imgGrayscale = 50;
     imgContrast = 50;
   } else if (imgLevel === FilterLevel.Medium) {
+    imgGrayscale = 70;
+    imgContrast = 30;
+  } else if (imgLevel === FilterLevel.High) {
     imgGrayscale = 90;
     imgContrast = 15;
   } else {
@@ -72,6 +65,9 @@ const buildCss = (imgLevel: FilterLevel, iframeLevel: FilterLevel) => {
     iframeGrayscale = 50;
     iframeContrast = 50;
   } else if (iframeLevel === FilterLevel.Medium) {
+    iframeGrayscale = 70;
+    iframeContrast = 30;
+  } else if (iframeLevel === FilterLevel.High) {
     iframeGrayscale = 90;
     iframeContrast = 15;
   } else {
@@ -79,6 +75,10 @@ const buildCss = (imgLevel: FilterLevel, iframeLevel: FilterLevel) => {
     iframeGrayscale = 50;
     iframeContrast = 0;
   }
+  /* To test levels, run this command in the browser debug console
+  let imgs=document.getElementsByTagName("img"); for(let i=0; i<imgs.length; i++) {imgs[i].style.filter = "contrast(15%) grayscale(90%)"};
+  */
+
   const css = `iframe {filter: contrast(${iframeContrast}%) grayscale(${iframeGrayscale}%) !important;} img,video {filter: contrast(${imgContrast}%) grayscale(${imgGrayscale}%) !important;} *[style*="background-image:"] {filter: contrast(${imgContrast}%) grayscale(${imgGrayscale}%) !important;}`;
   return css;
 };
@@ -89,10 +89,32 @@ interface IInsertedCssMap {
 /* This will hold css that has been inserted and can be used to remove it */
 let insertedCssMap: IInsertedCssMap = {};
 
+const setIcon = (isOn: boolean) => {
+  if (!isOn) {
+    // We aren't doing filtering
+    chrome.action.setIcon({
+      path: {
+        16: "/images/icon-off-16.png",
+        32: "/images/icon-off-32.png",
+        48: "/images/icon-off-48.png",
+        128: "/images/icon-off-128.png",
+      },
+    });
+  } else {
+    chrome.action.setIcon({
+      path: {
+        16: "/images/icon-16.png",
+        32: "/images/icon-32.png",
+        48: "/images/icon-48.png",
+        128: "/images/icon-128.png",
+      },
+    });
+  }
+};
 const setCss = (tab: chrome.tabs.Tab) => {
   const defaults: IStoredDataRules & IStoredDataOther = {
     generalImgLevel: FilterLevel.Low,
-    generalIframeLevel: FilterLevel.Medium,
+    generalIframeLevel: FilterLevel.High,
     isEnabled: true,
     customRulesArray0to49: [],
     customRulesArray50to99: [],
@@ -109,30 +131,15 @@ const setCss = (tab: chrome.tabs.Tab) => {
       customRulesArray100to149,
     } = items;
 
-    const customRulesArray = [
-      ...customRulesArray0to49,
-      ...customRulesArray50to99,
-      ...customRulesArray100to149,
-    ];
+    const customRulesArray = [...customRulesArray0to49, ...customRulesArray50to99, ...customRulesArray100to149];
 
     if (tab && tab.id && checkUrlEligibility(tab.url)) {
-      const matchingRules = getMatchingRules(
-        tab.url as string,
-        customRulesArray
-      );
+      const matchingRules = getMatchingRules(tab.url as string, customRulesArray);
 
       /* Use the last matching rule.  That's how they are displayed to users too. */
-      const lastMatch = matchingRules.length
-        ? matchingRules[matchingRules.length - 1]
-        : null;
-      const imgLevel =
-        lastMatch?.imgLevel !== undefined
-          ? lastMatch?.imgLevel
-          : generalImgLevel;
-      const iframeLevel =
-        lastMatch?.iframeLevel !== undefined
-          ? lastMatch?.iframeLevel
-          : generalIframeLevel;
+      const lastMatch = matchingRules.length ? matchingRules[matchingRules.length - 1] : null;
+      const imgLevel = lastMatch?.imgLevel !== undefined ? lastMatch?.imgLevel : generalImgLevel;
+      const iframeLevel = lastMatch?.iframeLevel !== undefined ? lastMatch?.iframeLevel : generalIframeLevel;
 
       const newCss = buildCss(imgLevel, iframeLevel);
       const oldCss = insertedCssMap[tab.id] || "";
@@ -149,9 +156,13 @@ const setCss = (tab: chrome.tabs.Tab) => {
           but there were times when a page was loading and it'd get set then somehow disappear from the page after
           an onChange event for loading and it'd need set again.
           (This happened when refreshing stackoverfow sites.) */
+        // console.log("jmr - insertCss", newCss);
         insertCss(tab.id, newCss);
         insertedCssMap[tab.id] = newCss;
       }
+      setIcon(!(imgLevel === FilterLevel.None && iframeLevel === FilterLevel.None) && isEnabled);
+    } else {
+      setIcon(false);
     }
   });
 };
@@ -199,5 +210,3 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
     });
   }
 });
-
-// jmr - consider using chrome.action.setIcon to change the icon to show whether filtering is on or off (maybe also eligble or not eligible)

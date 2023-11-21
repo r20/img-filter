@@ -5,19 +5,15 @@ export const checkUrlEligibility = (url: string | null | undefined) => {
   return url && url.startsWith("http");
 };
 
-export const getMatchingRules = (
-  currentUrl: string,
-  customRulesArray: ICustomRule[]
-): ICustomRule[] => {
+/** Given a url and the custom rules, finds which rules match. */
+export const getMatchingRules = (currentUrl: string, customRulesArray: ICustomRule[]): ICustomRule[] => {
   let matchingCustomRules = [];
   if (currentUrl) {
     for (let idx = 0; idx < customRulesArray.length; idx++) {
       const { matchString, matchType } = customRulesArray[idx];
       if (matchString) {
         if (matchType === MatchType.StartsWith) {
-          const withoutProtocol = currentUrl
-            .replace("https://", "")
-            .replace("http://", "");
+          const withoutProtocol = currentUrl.replace("https://", "").replace("http://", "");
 
           if (withoutProtocol.startsWith(matchString)) {
             matchingCustomRules.push(customRulesArray[idx]);
@@ -34,6 +30,7 @@ export const getMatchingRules = (
   return matchingCustomRules;
 };
 
+/** This is for debug to make lots of rules */
 const generateMockRules = () => {
   const manyRules = [];
   for (let idx = 0; idx < 50; idx++) {

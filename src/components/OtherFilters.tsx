@@ -19,19 +19,15 @@ interface IProps {
 }
 const OtherFilters = ({ showDefaultFilter }: IProps) => {
   const [isListOpen, setIsListOpen] = useState(false);
-  const {
-    customRulesArray,
-    onCustomRuleEdit,
-    onCustomRuleRemove,
-    onCustomRuleRemoveAll,
-    isMaxRulesReached,
-  } = useCustomRulesContext();
+  const { customRulesArray, onCustomRuleEdit, onCustomRuleRemove, onCustomRuleRemoveAll, isMaxRulesReached } =
+    useCustomRulesContext();
 
   const { activeTabCustomRule } = useActiveTabContext();
 
-  /* This became sluggish with hundreds.  Allowing just 150 rules to keep performance OK.
-  If really needed, we could redo how this so each isn't re-rendered on an update to allow thousands.
-  But it should be good for now. */
+  /* This becomes sluggish with hundreds.  Allowing just 150 rules to keep performance OK.
+  It should be good for now, but if really needed, we could redo things so each isn't 
+  re-rendered on an update to allow thousands.  Such as using a virutal list, and not putting
+  all rules in one array. */
 
   const otherRules = customRulesArray.filter((customRule) => {
     return customRule?.idx !== activeTabCustomRule?.idx; // Don't show current tab filter
@@ -54,10 +50,7 @@ const OtherFilters = ({ showDefaultFilter }: IProps) => {
           >
             <Typography variant="subtitle2">Other Filters</Typography>
             {isMaxRulesReached && (
-              <Typography
-                sx={{ color: "error.main", ml: "15px" }}
-                variant="subtitle2"
-              >
+              <Typography sx={{ color: "error.main", ml: "15px" }} variant="subtitle2">
                 (Max Number Reached)
               </Typography>
             )}
@@ -85,17 +78,8 @@ const OtherFilters = ({ showDefaultFilter }: IProps) => {
                 .reverse()}
 
               {otherRules.length > 0 && (
-                <Box
-                  display="flex"
-                  flexDirection="column"
-                  justifyContent="center"
-                  minHeight="100px"
-                >
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    onClick={onCustomRuleRemoveAll}
-                  >
+                <Box display="flex" flexDirection="column" justifyContent="center" minHeight="100px">
+                  <Button variant="outlined" color="error" onClick={onCustomRuleRemoveAll}>
                     Remove All Custom Filters
                   </Button>
                 </Box>
