@@ -113,7 +113,7 @@ const setIcon = (isOn: boolean) => {
 };
 const setCss = (tab: chrome.tabs.Tab) => {
   const defaults: IStoredDataRules & IStoredDataOther = {
-    generalImgLevel: FilterLevel.Low,
+    generalImgLevel: FilterLevel.None,
     generalIframeLevel: FilterLevel.High,
     isEnabled: true,
     customRulesArray0to49: [],

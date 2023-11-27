@@ -8,12 +8,12 @@ import FilterDesciptionDiv from "./FilterDescriptionDiv";
 
 /* These setting apply to all sites that don't have custom rules */
 const DefaultFilter = () => {
-  const [generalImgLevel, setGeneralImgLevel] = useState<FilterLevel>(FilterLevel.Low);
+  const [generalImgLevel, setGeneralImgLevel] = useState<FilterLevel>(FilterLevel.None);
   const [generalIframeLevel, setGeneralIframeLevel] = useState<FilterLevel>(FilterLevel.High);
 
   useEffect(() => {
     const defaults: IStoredDataOther = {
-      generalImgLevel: FilterLevel.Low,
+      generalImgLevel: FilterLevel.None,
       generalIframeLevel: FilterLevel.High,
     };
     // Restores preferences stored in chrome.storage.
