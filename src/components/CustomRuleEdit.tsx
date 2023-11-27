@@ -5,6 +5,7 @@ import Typography from "@mui/material/Typography";
 
 import FilterEdit from "./FilterEdit";
 import { ICustomRule } from "../types";
+import FilterDesciptionDiv from "./FilterDescriptionDiv";
 
 interface IProps {
   customRule: ICustomRule;
@@ -22,13 +23,14 @@ const CustomRuleEdit = ({ customRule, onCustomRuleEdit, onCustomRuleRemove }: IP
         gap: "15px",
       }}
     >
-      <Typography variant="body2" width={69}>
-        {customRule.matchType}
-      </Typography>
-
-      <Typography variant="body2" width={365} sx={{ wordBreak: "break-word" }}>
-        {customRule.matchString}
-      </Typography>
+      <FilterDesciptionDiv>
+        <Typography variant="body2" width={69} sx={{ flexShrink: 0 }}>
+          {customRule.matchType}
+        </Typography>
+        <Typography variant="body2" sx={{ wordBreak: "break-word" }}>
+          {customRule.matchString}
+        </Typography>
+      </FilterDesciptionDiv>
 
       <FilterEdit
         imgLevel={customRule.imgLevel}

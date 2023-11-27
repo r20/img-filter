@@ -1,12 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "@emotion/styled";
 
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
+import Box from "@mui/material/Box";
+import Accordion from "@mui/material/Accordion";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 import MatchTypeSelect from "./MatchTypeSelect";
 import FilterEdit from "./FilterEdit";
+import FilterDesciptionDiv from "./FilterDescriptionDiv";
 
 import { MatchType, ICustomRule } from "../types";
 
@@ -30,15 +36,23 @@ interface IProps {
 }
 
 const FilterCreate = ({ initialCustomRule, onSave }: IProps) => {
+  /* Use localstorage to remember if accordion is open or closed */
+  const [isAccordionOpen, setIsAccordionOpen] = React.useState(
+    localStorage.getItem("filter-create-accordion-open") === "true"
+  );
+
   const [customRule, setCustomRule] = useState<ICustomRule>(initialCustomRule);
   const [needAddAnotherConfirm, setNeedAddAnotherConfirm] = useState(true);
 
   const { customRulesArray } = useCustomRulesContext();
-  const { activeEligibleUrl, activeEligibleHostname, activeTabCustomRule } =
-    useActiveTabContext();
+  const { activeEligibleUrl, activeEligibleHostname, activeTabCustomRule } = useActiveTabContext();
 
   const matchingRules = getMatchingRules(activeEligibleUrl, [customRule]);
   const isMatching = activeEligibleUrl && matchingRules.length;
+
+  useEffect(() => {
+    localStorage.setItem("filter-create-accordion-open", String(isAccordionOpen));
+  }, [isAccordionOpen]);
 
   let isError = false;
   let helperText = "";
@@ -46,10 +60,7 @@ const FilterCreate = ({ initialCustomRule, onSave }: IProps) => {
     isError = false; // if it's empty, no error
   } else {
     const matches = customRulesArray.filter((rule) => {
-      return (
-        rule?.matchString === customRule.matchString &&
-        rule?.matchType === customRule.matchType
-      );
+      return rule?.matchString === customRule.matchString && rule?.matchType === customRule.matchType;
     });
 
     if (matches?.length > 0) {
@@ -75,79 +86,90 @@ const FilterCreate = ({ initialCustomRule, onSave }: IProps) => {
     setNeedAddAnotherConfirm(true);
   };
 
-  return activeTabCustomRule && needAddAnotherConfirm ? (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        minHeight: filterCreateHeight,
-      }}
-    >
-      <Button
-        variant="outlined"
-        onClick={() => {
-          setNeedAddAnotherConfirm(false);
-        }}
+  return (
+    <Box>
+      <Accordion
+        elevation={0}
+        sx={{ "&:before": { height: "0px" } }}
+        expanded={isAccordionOpen}
+        onChange={() => setIsAccordionOpen(!isAccordionOpen)}
       >
-        Add Another Custom Filter
-      </Button>
-    </div>
-  ) : (
-    <div style={{ minHeight: filterCreateHeight }}>
-      <Typography variant="subtitle2">Add Custom Filter</Typography>
-
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "15px",
-        }}
-      >
-        <MatchTypeSelect
-          idPrefix="add"
-          selectedValue={customRule.matchType}
-          onSelection={(val: MatchType) => {
-            setCustomRule({ ...customRule, matchType: val });
-          }}
-        />
-
-        <StyledTextField
-          id={`matchString-${customRule.idx}`}
-          label="text"
-          value={customRule.matchString}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            const val = event.target.value;
-            setCustomRule({ ...customRule, matchString: val });
-          }}
-          size="small"
-          fullWidth
-          variant="standard"
-          error={isError}
-          helperText={helperText}
-        />
-
-        <FilterEdit
-          imgLevel={customRule.imgLevel}
-          iframeLevel={customRule.iframeLevel}
-          onImgLevelChange={(val) =>
-            setCustomRule({ ...customRule, imgLevel: val })
-          }
-          onIframeLevelChange={(val) =>
-            setCustomRule({ ...customRule, iframeLevel: val })
-          }
-        />
-
-        <Button
-          size="small"
-          variant="contained"
-          onClick={onClickAdd}
-          disabled={isDisabled}
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel1bh-content"
+          id="panel1bh-header"
+          sx={{ padding: 0 }}
         >
-          Add
-        </Button>
-      </div>
-    </div>
+          <Typography variant="subtitle2">Add Custom Filter</Typography>
+        </AccordionSummary>
+        <AccordionDetails sx={{ padding: 0 }}>
+          {activeTabCustomRule && needAddAnotherConfirm ? (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                minHeight: filterCreateHeight,
+              }}
+            >
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  setNeedAddAnotherConfirm(false);
+                }}
+              >
+                Add Another Custom Filter
+              </Button>
+            </div>
+          ) : (
+            <div style={{ minHeight: filterCreateHeight }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "15px",
+                }}
+              >
+                <FilterDesciptionDiv>
+                  <MatchTypeSelect
+                    idPrefix="add"
+                    selectedValue={customRule.matchType}
+                    onSelection={(val: MatchType) => {
+                      setCustomRule({ ...customRule, matchType: val });
+                    }}
+                  />
+
+                  <StyledTextField
+                    id={`matchString-${customRule.idx}`}
+                    label="text"
+                    value={customRule.matchString}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                      const val = event.target.value;
+                      setCustomRule({ ...customRule, matchString: val });
+                    }}
+                    size="small"
+                    fullWidth
+                    variant="standard"
+                    error={isError}
+                    helperText={helperText}
+                  />
+                </FilterDesciptionDiv>
+                <FilterEdit
+                  imgLevel={customRule.imgLevel}
+                  iframeLevel={customRule.iframeLevel}
+                  onImgLevelChange={(val) => setCustomRule({ ...customRule, imgLevel: val })}
+                  onIframeLevelChange={(val) => setCustomRule({ ...customRule, iframeLevel: val })}
+                />
+
+                <Button size="small" variant="contained" onClick={onClickAdd} disabled={isDisabled}>
+                  Add
+                </Button>
+              </div>
+            </div>
+          )}
+        </AccordionDetails>
+      </Accordion>
+    </Box>
   );
 };
 

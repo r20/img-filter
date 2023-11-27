@@ -7,6 +7,7 @@ import FilterEdit from "./FilterEdit";
 import { useCustomRulesContext } from "../context/CustomRulesContext";
 import { useActiveTabContext } from "../context/ActiveTabContext";
 import DefaultFilter from "./DefaultFilter";
+import FilterDesciptionDiv from "./FilterDescriptionDiv";
 
 const ActiveFilter = () => {
   const { activeTabCustomRule } = useActiveTabContext();
@@ -27,27 +28,19 @@ const ActiveFilter = () => {
           gap: "15px",
         }}
       >
-        <Typography variant="body2" width={69}>
-          {activeTabCustomRule.matchType}
-        </Typography>
-
-        <Typography
-          variant="body2"
-          width={365}
-          sx={{ wordBreak: "break-word" }}
-        >
-          {activeTabCustomRule.matchString}
-        </Typography>
-
+        <FilterDesciptionDiv>
+          <Typography variant="body2" width={69} sx={{ flexShrink: 0 }}>
+            {activeTabCustomRule.matchType}
+          </Typography>
+          <Typography variant="body2" sx={{ wordBreak: "break-word" }}>
+            {activeTabCustomRule.matchString}
+          </Typography>
+        </FilterDesciptionDiv>
         <FilterEdit
           imgLevel={activeTabCustomRule.imgLevel}
           iframeLevel={activeTabCustomRule.iframeLevel}
-          onImgLevelChange={(val) =>
-            onCustomRuleEdit({ ...activeTabCustomRule, imgLevel: val })
-          }
-          onIframeLevelChange={(val) =>
-            onCustomRuleEdit({ ...activeTabCustomRule, iframeLevel: val })
-          }
+          onImgLevelChange={(val) => onCustomRuleEdit({ ...activeTabCustomRule, imgLevel: val })}
+          onIframeLevelChange={(val) => onCustomRuleEdit({ ...activeTabCustomRule, iframeLevel: val })}
         />
 
         <IconButton onClick={() => onCustomRuleRemove(activeTabCustomRule)}>

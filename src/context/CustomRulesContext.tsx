@@ -1,11 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 
-import {
-  ICustomRule,
-  IStoredDataOther,
-  IStoredDataRules,
-  FilterLevel,
-} from "../types";
+import { ICustomRule, IStoredDataOther, IStoredDataRules, FilterLevel } from "../types";
 
 interface ICustomRulesContext {
   lastCustomImgLevelUsed: FilterLevel;
@@ -33,10 +28,8 @@ interface IProps {
   children?: React.ReactNode;
 }
 const CustomRulesContextProvider = (props: IProps) => {
-  const [lastCustomImgLevelUsed, setlastCustomImgLevelUsed] =
-    useState<FilterLevel>(FilterLevel.None);
-  const [lastCustomIframeLevelUsed, setlastCustomIframeLevelUsed] =
-    useState<FilterLevel>(FilterLevel.None);
+  const [lastCustomImgLevelUsed, setlastCustomImgLevelUsed] = useState<FilterLevel>(FilterLevel.None);
+  const [lastCustomIframeLevelUsed, setlastCustomIframeLevelUsed] = useState<FilterLevel>(FilterLevel.None);
   const [customRulesArray, setCustomRuleArray] = useState<ICustomRule[]>([]);
 
   useEffect(() => {
@@ -65,11 +58,7 @@ const CustomRulesContextProvider = (props: IProps) => {
     );
   }, []);
 
-  const saveValues = (
-    newVal: ICustomRule[],
-    lastImgLevel: FilterLevel,
-    lastIframeLevel: FilterLevel
-  ) => {
+  const saveValues = (newVal: ICustomRule[], lastImgLevel: FilterLevel, lastIframeLevel: FilterLevel) => {
     const forStorage: IStoredDataOther & IStoredDataRules = {
       customRulesArray0to49: newVal.slice(0, 50),
       customRulesArray50to99: newVal.slice(50, 100),
@@ -139,9 +128,7 @@ const CustomRulesContextProvider = (props: IProps) => {
 const useCustomRulesContext = () => {
   const context = useContext(CustomRulesContext);
   if (!context) {
-    throw new Error(
-      `useCustomRulesContext must be used within a CustomRulesContextProvider`
-    );
+    throw new Error(`useCustomRulesContext must be used within a CustomRulesContextProvider`);
   }
   return context;
 };

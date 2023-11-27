@@ -4,6 +4,7 @@ import Typography from "@mui/material/Typography";
 
 import { FilterLevel, IStoredDataOther } from "../types";
 import FilterEdit from "./FilterEdit";
+import FilterDesciptionDiv from "./FilterDescriptionDiv";
 
 /* These setting apply to all sites that don't have custom rules */
 const DefaultFilter = () => {
@@ -30,14 +31,11 @@ const DefaultFilter = () => {
         gap: "15px",
       }}
     >
-      <Typography variant="body2" width={365} sx={{ fontWeight: "light" }}>
-        DEFAULT
-      </Typography>
-
-      <Typography variant="body2" width={69}>
-        {" " /* This is here to make sure spacing is similar to FilterEdit */}
-      </Typography>
-
+      <FilterDesciptionDiv>
+        <Typography variant="body2" sx={{ fontWeight: "light" }}>
+          DEFAULT
+        </Typography>
+      </FilterDesciptionDiv>
       <FilterEdit
         imgLevel={generalImgLevel}
         iframeLevel={generalIframeLevel}
