@@ -37,7 +37,7 @@ const FilteringIsEnabled = () => {
         }
         label="Enable Extension"
       />
-      <Tooltip title="Filter images and iframes. Iframes are embedded websites often used for ads, though some sites also use iframes for regular content.">
+      <Tooltip title="Filter images and iframes. Iframes are embedded websites often used for ads, but may also be used for regular content.">
         <IconButton size="small">
           <InfoOutlinedIcon />
         </IconButton>

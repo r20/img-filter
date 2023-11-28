@@ -1,8 +1,8 @@
 import { ICustomRule, MatchType, FilterLevel } from "./types";
 
-/** Returns true if URL starts with http */
+/** Returns true if URL starts with http and is also not among sites not allowed (like chrome.google.com)*/
 export const checkUrlEligibility = (url: string | null | undefined) => {
-  return url && url.startsWith("http");
+  return url && url.startsWith("http") && url.indexOf("https://chrome.google.com") === -1;
 };
 
 /** Given a url and the custom rules, finds which rules match. */

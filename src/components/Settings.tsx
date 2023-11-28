@@ -28,13 +28,8 @@ const StyledDiv = styled.div`
 
 const Settings = () => {
   const { activeEligibleHostname, activeTabCustomRule } = useActiveTabContext();
-  const {
-    customRulesArray,
-    lastCustomImgLevelUsed,
-    lastCustomIframeLevelUsed,
-    onCustomRuleAdd,
-    isMaxRulesReached,
-  } = useCustomRulesContext();
+  const { customRulesArray, lastCustomImgLevelUsed, lastCustomIframeLevelUsed, onCustomRuleAdd, isMaxRulesReached } =
+    useCustomRulesContext();
 
   return (
     <StyledDiv>
@@ -42,6 +37,7 @@ const Settings = () => {
       {activeEligibleHostname ? (
         <>
           <ActiveFilter />
+
           {isMaxRulesReached ? (
             <div
               style={{
@@ -52,11 +48,7 @@ const Settings = () => {
                 minHeight: filterCreateHeight,
               }}
             >
-              <Typography
-                variant="subtitle1"
-                color="main.error"
-                sx={{ fontWeight: "light" }}
-              >
+              <Typography variant="subtitle1" color="main.error" sx={{ fontWeight: "light" }}>
                 Maximum number of custom rules reached.
               </Typography>
             </div>
@@ -86,18 +78,12 @@ const Settings = () => {
             marginBottom: "50px",
           }}
         >
-          <Typography
-            variant="subtitle1"
-            color="main.secondary"
-            sx={{ fontWeight: "light" }}
-          >
+          <Typography variant="subtitle1" color="main.secondary" sx={{ fontWeight: "light" }}>
             This page is not eligible for filtering.
           </Typography>
         </div>
       )}
-      <OtherFilters
-        showDefaultFilter={!!(activeTabCustomRule || !activeEligibleHostname)}
-      />
+      <OtherFilters showDefaultFilter={!!(activeTabCustomRule || !activeEligibleHostname)} />
     </StyledDiv>
   );
 };
