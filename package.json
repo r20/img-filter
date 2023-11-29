@@ -1,6 +1,6 @@
 {
   "name": "img-filter",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Reduce distraction by applying filters to iframes (which often serve ads) and images.",
   "main": "index.js",
   "scripts": {

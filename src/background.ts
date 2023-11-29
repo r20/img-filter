@@ -2,6 +2,7 @@ import { FilterLevel, IStoredDataRules, IStoredDataOther } from "./types";
 import { checkUrlEligibility, getMatchingRules } from "./utilities";
 
 const insertCss = (tabId: number, css: string, allFrames: boolean) => {
+  console.log("jmr - insertCss", tabId, css, allFrames);
   try {
     return chrome.scripting.insertCSS(
       {
@@ -23,6 +24,7 @@ const insertCss = (tabId: number, css: string, allFrames: boolean) => {
 };
 
 const removeCss = (tabId: number, css: string, allFrames: boolean) => {
+  console.log("jmr - removeCss", tabId, css, allFrames);
   try {
     return chrome.scripting.removeCSS({
       target: {
@@ -38,7 +40,12 @@ const removeCss = (tabId: number, css: string, allFrames: boolean) => {
   }
 };
 
-const buildCss = (imgLevel: FilterLevel, iframeLevel: FilterLevel) => {
+interface ICssInfo {
+  imgCss: string;
+  iframeCss: string;
+  isIframeOff: boolean;
+}
+const buildCss = (imgLevel: FilterLevel, iframeLevel: FilterLevel): ICssInfo => {
   let imgGrayscale, iframeGrayscale, imgContrast, iframeContrast;
   if (imgLevel === FilterLevel.None) {
     imgGrayscale = 0;
@@ -58,9 +65,11 @@ const buildCss = (imgLevel: FilterLevel, iframeLevel: FilterLevel) => {
     imgContrast = 0;
   }
 
+  let isIframeOff = false;
   if (iframeLevel === FilterLevel.None) {
     iframeGrayscale = 0;
     iframeContrast = 100;
+    isIframeOff = true;
   } else if (iframeLevel === FilterLevel.Low) {
     iframeGrayscale = 50;
     iframeContrast = 50;
@@ -84,15 +93,14 @@ const buildCss = (imgLevel: FilterLevel, iframeLevel: FilterLevel) => {
     We still want images within iframes to be filtere. */
   const iframeCss = `iframe {filter: contrast(${iframeContrast}%) grayscale(${iframeGrayscale}%) !important;} `;
   const imgCss = `img,video {filter: contrast(${imgContrast}%) grayscale(${imgGrayscale}%) !important;} *[style*="background-image:"] {filter: contrast(${imgContrast}%) grayscale(${imgGrayscale}%) !important;}`;
-  return { iframeCss, imgCss };
+  return { iframeCss, imgCss, isIframeOff };
 };
 
-interface IInsertedCssMap {
-  [key: string]: string;
+interface ITabIdToCssMap {
+  [key: string]: ICssInfo;
 }
-/* This will hold css that has been inserted and can be used to remove it */
-let insertedIframeCssMap: IInsertedCssMap = {};
-let insertedImgCssMap: IInsertedCssMap = {};
+/* This will hold css info about what was inserted and can be used to remove it */
+let tabIdToCssMap: ITabIdToCssMap = {};
 
 const setIcon = (isOn: boolean) => {
   if (!isOn) {
@@ -147,23 +155,24 @@ const setCss = (tab: chrome.tabs.Tab) => {
       const imgLevel = lastMatch?.imgLevel !== undefined ? lastMatch?.imgLevel : generalImgLevel;
       const iframeLevel = lastMatch?.iframeLevel !== undefined ? lastMatch?.iframeLevel : generalIframeLevel;
 
-      const { iframeCss, imgCss } = buildCss(imgLevel, iframeLevel);
-      const oldImgCss = insertedImgCssMap[tab.id] || "";
-      const oldIframeCss = insertedIframeCssMap[tab.id] || "";
+      const {
+        iframeCss: newIframeCss,
+        imgCss: newImgCss,
+        isIframeOff: newIsIframeOff,
+      } = buildCss(imgLevel, iframeLevel);
+      const { iframeCss: oldIframeCss, imgCss: oldImgCss, isIframeOff: oldIsIframeOff } = tabIdToCssMap[tab.id] || "";
 
       if (oldImgCss) {
         /* If there's old remove it. Don't bother waiting for remove (which is an async operation).
           I think it's ok to add other css before remove is finished. */
-        console.log("jmr - removeCss", oldImgCss, tab.id);
-        removeCss(tab.id, oldImgCss, true);
-        delete insertedImgCssMap[tab.id];
+        removeCss(tab.id, oldImgCss, oldIsIframeOff);
+        delete tabIdToCssMap[tab.id];
       }
       if (oldIframeCss) {
         /* If there's old remove it. Don't bother waiting for remove (which is an async operation).
           I think it's ok to add other css before remove is finished. */
-        console.log("jmr - removeCss", oldIframeCss, tab.id);
         removeCss(tab.id, oldIframeCss, false);
-        delete insertedIframeCssMap[tab.id];
+        delete tabIdToCssMap[tab.id];
       }
 
       if (isEnabled) {
@@ -171,11 +180,14 @@ const setCss = (tab: chrome.tabs.Tab) => {
           but there were times when a page was loading and it'd get set then somehow disappear from the page after
           an onChange event for loading and it'd need set again.
           (This happened when refreshing stackoverfow sites.) */
-        console.log("jmr - insertCss", imgCss, iframeCss, tab.id);
-        insertCss(tab.id, imgCss, true);
-        insertedImgCssMap[tab.id] = imgCss;
-        insertCss(tab.id, iframeCss, false);
-        insertedIframeCssMap[tab.id] = iframeCss;
+        // If newIsIframeOff (no iframe filtering), set allFrames to filter images within iframes
+        insertCss(tab.id, newImgCss, newIsIframeOff);
+        insertCss(tab.id, newIframeCss, false);
+        tabIdToCssMap[tab.id] = {
+          iframeCss: newIframeCss,
+          imgCss: newImgCss,
+          isIframeOff: newIsIframeOff,
+        };
       }
       setIcon(!(imgLevel === FilterLevel.None && iframeLevel === FilterLevel.None) && isEnabled);
     } else {
