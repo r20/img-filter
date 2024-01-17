@@ -3,12 +3,13 @@ import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 
-import FilterEdit from "./FilterEdit";
+import FilterSettings from "./FilterSettings";
 import { useCustomRulesContext } from "../context/CustomRulesContext";
 import { useActiveTabContext } from "../context/ActiveTabContext";
 import DefaultFilter from "./DefaultFilter";
-import FilterDesciptionDiv from "./FilterDescriptionDiv";
+import FilterDescriptionWrapper from "./FilterDescriptionWrapper";
 
+/** Shows the filters in effect for the current website. */
 const ActiveFilter = () => {
   const { activeTabCustomRule } = useActiveTabContext();
   const { onCustomRuleEdit, onCustomRuleRemove } = useCustomRulesContext();
@@ -28,15 +29,15 @@ const ActiveFilter = () => {
           gap: "15px",
         }}
       >
-        <FilterDesciptionDiv>
+        <FilterDescriptionWrapper>
           <Typography variant="body2" width={69} sx={{ flexShrink: 0 }}>
             {activeTabCustomRule.matchType}
           </Typography>
           <Typography variant="body2" sx={{ wordBreak: "break-word" }}>
             {activeTabCustomRule.matchString}
           </Typography>
-        </FilterDesciptionDiv>
-        <FilterEdit
+        </FilterDescriptionWrapper>
+        <FilterSettings
           imgLevel={activeTabCustomRule.imgLevel}
           iframeLevel={activeTabCustomRule.iframeLevel}
           onImgLevelChange={(val) => onCustomRuleEdit({ ...activeTabCustomRule, imgLevel: val })}

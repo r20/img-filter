@@ -3,15 +3,25 @@ import React, { useState, useContext, useEffect } from "react";
 import { ICustomRule, IStoredDataOther, IStoredDataRules, FilterLevel } from "../types";
 
 interface ICustomRulesContext {
+  /** The last img filter level used for a custom rule */
   lastCustomImgLevelUsed: FilterLevel;
+  /** The last iframe filter level used for a custom rule */
   lastCustomIframeLevelUsed: FilterLevel;
+  /** An array of all the custom rules */
   customRulesArray: ICustomRule[];
+  /** Callback when adding a custom rule. */
   onCustomRuleAdd: (rule: ICustomRule) => void;
+  /** Callback when editing a custom rule. */
   onCustomRuleEdit: (rule: ICustomRule) => void;
+  /** Callback when removing a single custom rule. */
   onCustomRuleRemove: (rule: ICustomRule) => void;
+  /** Callback when removing all custom rules. */
   onCustomRuleRemoveAll: () => void;
+  /** boolean, true if there are the max number of rules (150) */
   isMaxRulesReached: boolean;
 }
+
+const MAX_NUMBER_RULES = 150;
 
 const CustomRulesContext = React.createContext<ICustomRulesContext>({
   lastCustomImgLevelUsed: FilterLevel.None,
@@ -59,6 +69,8 @@ const CustomRulesContextProvider = (props: IProps) => {
   }, []);
 
   const saveValues = (newVal: ICustomRule[], lastImgLevel: FilterLevel, lastIframeLevel: FilterLevel) => {
+    /* If there's too much data within one key, we get this error: BYTES_PER_ITEM quota exceeded
+    so split it up into chunks and store the data separately. */
     const forStorage: IStoredDataOther & IStoredDataRules = {
       customRulesArray0to49: newVal.slice(0, 50),
       customRulesArray50to99: newVal.slice(50, 100),
@@ -110,7 +122,7 @@ const CustomRulesContextProvider = (props: IProps) => {
     );
   };
 
-  const isMaxRulesReached = customRulesArray.length >= 150;
+  const isMaxRulesReached = customRulesArray.length >= MAX_NUMBER_RULES;
 
   const val: ICustomRulesContext = {
     lastCustomImgLevelUsed,

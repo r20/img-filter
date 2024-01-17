@@ -5,16 +5,17 @@ import useActiveTab from "../hooks/useActiveTab";
 import { getMatchingRules } from "../utilities";
 import { useCustomRulesContext } from "./CustomRulesContext";
 
-/** activeTab has the chomre.tabs.Tab object of the current active tab.
- * activeEligibleHostname and activeEligibleUrl strings are the hostname and url if eligible for filtering (else they are empty string).
- * activeTabMatchingRules are all rules that match the current tab.
- * activeTabCustomRule is the rule in effect (the last item in activeTabMatchingRules) */
 interface IActiveTabContext {
+  /** Has the chrome.tabs.Tab object of the current active tab. */
   activeTab: chrome.tabs.Tab | null;
+  /**  hostname if eligible for filtering (else empty string) */
   activeEligibleHostname: string;
+  /**  url if eligible for filtering (else empty string) */
   activeEligibleUrl: string;
+  /** all rules that match the current tab */
   activeTabMatchingRules: ICustomRule[];
-  activeTabCustomRule: ICustomRule | null; // The actual matching rule that's in effect
+  /** The rule in effect (the last item in activeTabMatchingRules) */
+  activeTabCustomRule: ICustomRule | null;
 }
 
 const ActiveTabContext = React.createContext<IActiveTabContext>({
@@ -29,14 +30,10 @@ interface IProps {
   children?: React.ReactNode;
 }
 const ActiveTabContextProvider = (props: IProps) => {
-  const { activeTab, activeEligibleHostname, activeEligibleUrl } =
-    useActiveTab();
+  const { activeTab, activeEligibleHostname, activeEligibleUrl } = useActiveTab();
 
   const { customRulesArray } = useCustomRulesContext();
-  const activeTabMatchingRules = getMatchingRules(
-    activeEligibleUrl,
-    customRulesArray
-  );
+  const activeTabMatchingRules = getMatchingRules(activeEligibleUrl, customRulesArray);
 
   const activeTabCustomRule = activeTabMatchingRules.length
     ? activeTabMatchingRules[activeTabMatchingRules.length - 1]
@@ -55,9 +52,7 @@ const ActiveTabContextProvider = (props: IProps) => {
 const useActiveTabContext = () => {
   const context = useContext(ActiveTabContext);
   if (!context) {
-    throw new Error(
-      `useActiveTabContext must be used within a ActiveTabContextProvider`
-    );
+    throw new Error(`useActiveTabContext must be used within a ActiveTabContextProvider`);
   }
   return context;
 };

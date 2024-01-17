@@ -3,7 +3,7 @@ import styled from "@emotion/styled";
 
 /** A standard width flex div to bring consistency to ActiveFilter, DefaultFilter,
  * CustomRuleEdit, and FilterCreate */
-const FilterDesciptionDiv = styled.div`
+const FilterDesciptionWrapper = styled.div`
   display: flex;
   alignitems: center;
   gap: 15px;
@@ -11,4 +11,4 @@ const FilterDesciptionDiv = styled.div`
   flex-shrink: 0;
 `;
 
-export default FilterDesciptionDiv;
+export default FilterDesciptionWrapper;

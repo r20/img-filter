@@ -1,4 +1,4 @@
-// jmr - will we do anything here????
+// Not doing anything anymore with content_scripts.
 
 // let [tab] = await chrome.tabs.query({
 //   active: true,

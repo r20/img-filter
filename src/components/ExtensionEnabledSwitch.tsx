@@ -8,7 +8,8 @@ import Tooltip from "@mui/material/Tooltip";
 
 import { IStoredDataOther } from "../types";
 
-const FilteringIsEnabled = () => {
+/** Switch for turning on/off all filtering */
+const ExtensionEnabledSwitch = () => {
   const [isEnabled, setIsEnabled] = useState(true);
 
   useEffect(() => {
@@ -46,4 +47,4 @@ const FilteringIsEnabled = () => {
   );
 };
 
-export default FilteringIsEnabled;
+export default ExtensionEnabledSwitch;
