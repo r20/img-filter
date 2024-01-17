@@ -12,11 +12,12 @@ import { useCustomRulesContext } from "../context/CustomRulesContext";
 import { useActiveTabContext } from "../context/ActiveTabContext";
 import DefaultFilter from "./DefaultFilter";
 
-/** This shows the other filters besides the current active filter. 
-    If showDefaultFilter is set, shows that at the top before other filters. */
 interface IProps {
   showDefaultFilter: boolean;
 }
+
+/** This shows the other filters besides the current active filter. 
+    If showDefaultFilter is set, shows that at the top before other filters. */
 const OtherFilters = ({ showDefaultFilter }: IProps) => {
   const [isListOpen, setIsListOpen] = useState(false);
   const { customRulesArray, onCustomRuleEdit, onCustomRuleRemove, onCustomRuleRemoveAll, isMaxRulesReached } =

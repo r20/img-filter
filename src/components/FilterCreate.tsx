@@ -11,8 +11,8 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 import MatchTypeSelect from "./MatchTypeSelect";
-import FilterEdit from "./FilterEdit";
-import FilterDesciptionDiv from "./FilterDescriptionDiv";
+import FilterSettings from "./FilterSettings";
+import FilterDescriptionWrapper from "./FilterDescriptionWrapper";
 
 import { MatchType, ICustomRule } from "../types";
 
@@ -35,6 +35,7 @@ interface IProps {
   onSave: (newCustomRule: ICustomRule) => void;
 }
 
+/** If the current website doesn't have a custom filter, this is shown allowing creation. */
 const FilterCreate = ({ initialCustomRule, onSave }: IProps) => {
   /* Use localstorage to remember if accordion is open or closed */
   const [isAccordionOpen, setIsAccordionOpen] = React.useState(
@@ -130,7 +131,7 @@ const FilterCreate = ({ initialCustomRule, onSave }: IProps) => {
                   gap: "15px",
                 }}
               >
-                <FilterDesciptionDiv>
+                <FilterDescriptionWrapper>
                   <MatchTypeSelect
                     idPrefix="add"
                     selectedValue={customRule.matchType}
@@ -153,8 +154,8 @@ const FilterCreate = ({ initialCustomRule, onSave }: IProps) => {
                     error={isError}
                     helperText={helperText}
                   />
-                </FilterDesciptionDiv>
-                <FilterEdit
+                </FilterDescriptionWrapper>
+                <FilterSettings
                   imgLevel={customRule.imgLevel}
                   iframeLevel={customRule.iframeLevel}
                   onImgLevelChange={(val) => setCustomRule({ ...customRule, imgLevel: val })}

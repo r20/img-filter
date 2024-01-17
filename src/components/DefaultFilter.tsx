@@ -3,10 +3,10 @@ import React, { useEffect, useState } from "react";
 import Typography from "@mui/material/Typography";
 
 import { FilterLevel, IStoredDataOther } from "../types";
-import FilterEdit from "./FilterEdit";
-import FilterDesciptionDiv from "./FilterDescriptionDiv";
+import FilterSettings from "./FilterSettings";
+import FilterDescriptionWrapper from "./FilterDescriptionWrapper";
 
-/* These setting apply to all sites that don't have custom rules */
+/* These setting apply to all sites that don't have custom filter rules */
 const DefaultFilter = () => {
   const [generalImgLevel, setGeneralImgLevel] = useState<FilterLevel>(FilterLevel.None);
   const [generalIframeLevel, setGeneralIframeLevel] = useState<FilterLevel>(FilterLevel.High);
@@ -31,12 +31,12 @@ const DefaultFilter = () => {
         gap: "15px",
       }}
     >
-      <FilterDesciptionDiv>
+      <FilterDescriptionWrapper>
         <Typography variant="body2" sx={{ fontWeight: "light" }}>
           DEFAULT
         </Typography>
-      </FilterDesciptionDiv>
-      <FilterEdit
+      </FilterDescriptionWrapper>
+      <FilterSettings
         imgLevel={generalImgLevel}
         iframeLevel={generalIframeLevel}
         onImgLevelChange={(val) => {

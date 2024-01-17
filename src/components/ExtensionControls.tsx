@@ -3,7 +3,7 @@ import styled from "@emotion/styled";
 import Typography from "@mui/material/Typography";
 
 import { useActiveTabContext } from "../context/ActiveTabContext";
-import FilteringIsEnabled from "./FilteringIsEnabled";
+import ExtensionEnabledSwitch from "./ExtensionEnabledSwitch";
 import ActiveFilter from "./ActiveFilter";
 import FilterCreate from "./FilterCreate";
 import OtherFilters from "./OtherFilters";
@@ -26,14 +26,14 @@ const StyledDiv = styled.div`
   }
 `;
 
-const Settings = () => {
+const ExtensonControls = () => {
   const { activeEligibleHostname, activeTabCustomRule } = useActiveTabContext();
   const { customRulesArray, lastCustomImgLevelUsed, lastCustomIframeLevelUsed, onCustomRuleAdd, isMaxRulesReached } =
     useCustomRulesContext();
 
   return (
     <StyledDiv>
-      <FilteringIsEnabled />
+      <ExtensionEnabledSwitch />
       {activeEligibleHostname ? (
         <>
           <ActiveFilter />
@@ -88,4 +88,4 @@ const Settings = () => {
   );
 };
 
-export default Settings;
+export default ExtensonControls;

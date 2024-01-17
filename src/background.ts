@@ -88,10 +88,24 @@ const buildCss = (imgLevel: FilterLevel, iframeLevel: FilterLevel): ICssInfo => 
   let imgs=document.getElementsByTagName("img"); for(let i=0; i<imgs.length; i++) {imgs[i].style.filter = "contrast(15%) grayscale(90%)"};
   */
 
-  /* Have separate css for iframes and images because we want to do insertCss with allFrames false for iframes
+  /*   
+    jmr - TBD I've tried to filter shadowdoms (with :host) and parents of shadowdomes (with :has(:host))
+    but those didn't work.  Adding *.OUTBRAIN because it's ads.
+    
+    When I looked at newsweek https://www.newsweek.com/joe-biden-breathtaking-mistake-legal-analyst-1852621
+    there are "Sponsored content" ads and they are NOT iframe or shadowDOM.
+    They have img with a mcimg class and have crossorigin set.
+    img.mcimg[crossorigin]
+    Maybe I should treat that has an iframe and not as imgCss??
+    Maybe I should NOT have imgCss set img[crossorigin] but have that in the iframeCss instead??
+    Maybe I need to rename iframeCss to something else and target likely sources of ads and junk
+    and exclude some known good iframes.
+    */
+
+  /* We have separate css for iframes and images because we want to do insertCss with allFrames false for iframes
     because sometimes ads have iframes within iframes and it makes it look darker than the selected filter.
-    We still want images within iframes to be filtere. */
-  const iframeCss = `iframe {filter: contrast(${iframeContrast}%) grayscale(${iframeGrayscale}%) !important;} `;
+    We still want images within iframes to be filtered. */
+  const iframeCss = `iframe, *.OUTBRAIN, a[rel~="sponsored"] {filter: contrast(${iframeContrast}%) grayscale(${iframeGrayscale}%) !important;} `;
   const imgCss = `img,video {filter: contrast(${imgContrast}%) grayscale(${imgGrayscale}%) !important;} *[style*="background-image:"] {filter: contrast(${imgContrast}%) grayscale(${imgGrayscale}%) !important;}`;
   return { iframeCss, imgCss, isIframeOff };
 };

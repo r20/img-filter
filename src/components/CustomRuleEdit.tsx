@@ -3,9 +3,9 @@ import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 
-import FilterEdit from "./FilterEdit";
+import FilterSettings from "./FilterSettings";
 import { ICustomRule } from "../types";
-import FilterDesciptionDiv from "./FilterDescriptionDiv";
+import FilterDescriptionWrapper from "./FilterDescriptionWrapper";
 
 interface IProps {
   customRule: ICustomRule;
@@ -23,16 +23,16 @@ const CustomRuleEdit = ({ customRule, onCustomRuleEdit, onCustomRuleRemove }: IP
         gap: "15px",
       }}
     >
-      <FilterDesciptionDiv>
+      <FilterDescriptionWrapper>
         <Typography variant="body2" width={69} sx={{ flexShrink: 0 }}>
           {customRule.matchType}
         </Typography>
         <Typography variant="body2" sx={{ wordBreak: "break-word" }}>
           {customRule.matchString}
         </Typography>
-      </FilterDesciptionDiv>
+      </FilterDescriptionWrapper>
 
-      <FilterEdit
+      <FilterSettings
         imgLevel={customRule.imgLevel}
         iframeLevel={customRule.iframeLevel}
         onImgLevelChange={(val) => onCustomRuleEdit({ ...customRule, imgLevel: val })}

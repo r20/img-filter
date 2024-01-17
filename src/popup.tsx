@@ -6,7 +6,7 @@ import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 
-import Settings from "./components/Settings";
+import ExtensionControls from "./components/ExtensionControls";
 
 import { CustomRulesContextProvider } from "./context/CustomRulesContext";
 import { ActiveTabContextProvider } from "./context/ActiveTabContext";
@@ -17,13 +17,13 @@ root.render(
   <React.StrictMode>
     <CustomRulesContextProvider>
       <ActiveTabContextProvider>
-        <Settings />
+        <ExtensionControls />
       </ActiveTabContextProvider>
     </CustomRulesContextProvider>
   </React.StrictMode>
 );
 
-/* if I want to see when popup closes I could try this in this file:
+/* If I wanted to see when popup closes I could try this in this file:
 chrome.runtime.connect({ name: "popup" });
 
 and in background.js or elsewhere do this
@@ -34,8 +34,6 @@ chrome.runtime.onConnect.addListener(function(port) {
         });
     }
 });
-
-
 
 Or alternatively, I could try this to execute a function when the popup closes
 document.addEventListener('visibilitychange', MyFunction, false);

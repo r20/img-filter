@@ -13,6 +13,7 @@ interface IProps {
   onSelection: (newVal: MatchType) => void;
 }
 
+/** Allows chosing whether the filter should contain or start with the text. */
 const MatchTypeSelect = ({ idPrefix, selectedValue, onSelection }: IProps) => {
   const handleChange = (event: SelectChangeEvent) => {
     onSelection(event.target.value as unknown as MatchType);
@@ -22,9 +23,7 @@ const MatchTypeSelect = ({ idPrefix, selectedValue, onSelection }: IProps) => {
   return (
     <Box sx={{ minWidth: 120 }}>
       <FormControl fullWidth size="small" variant="standard">
-        <InputLabel id={`${idPrefix}-host-match-type-select-label`}>
-          should
-        </InputLabel>
+        <InputLabel id={`${idPrefix}-host-match-type-select-label`}>should</InputLabel>
         <Select
           labelId={`${idPrefix}-host-match-type-select-label`}
           id={`${idPrefix}-host-match-type-select`}

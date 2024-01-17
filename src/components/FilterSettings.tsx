@@ -13,8 +13,9 @@ interface IProps {
   onIframeLevelChange: (newVal: FilterLevel) => void;
 }
 
-/* This shows the image and iframe levels and allows editing */
-const FilterEdit = ({ imgLevel, iframeLevel, onImgLevelChange, onIframeLevelChange }: IProps) => {
+/* This shows the image and iframe levels and allows editing. It's used by other components like
+ActiveFilter, DefaultFIlter, FilterCreate,  ... */
+const FilterSettings = ({ imgLevel, iframeLevel, onImgLevelChange, onIframeLevelChange }: IProps) => {
   return (
     <div>
       <div
@@ -86,4 +87,4 @@ const FilterEdit = ({ imgLevel, iframeLevel, onImgLevelChange, onIframeLevelChan
   );
 };
 
-export default FilterEdit;
+export default FilterSettings;
