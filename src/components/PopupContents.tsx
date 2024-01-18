@@ -12,7 +12,6 @@ import { MatchType } from "../types";
 import { filterCreateHeight } from "./FilterCreate";
 
 const StyledDiv = styled.div`
-  width: 760px;
   padding: 15px;
   min-height: 250px;
   & > * {
@@ -26,7 +25,8 @@ const StyledDiv = styled.div`
   }
 `;
 
-const ExtensonControls = () => {
+/** This has the content of the extension popup */
+const PopupContents = () => {
   const { activeEligibleHostname, activeTabCustomRule } = useActiveTabContext();
   const { customRulesArray, lastCustomImgLevelUsed, lastCustomIframeLevelUsed, onCustomRuleAdd, isMaxRulesReached } =
     useCustomRulesContext();
@@ -88,4 +88,4 @@ const ExtensonControls = () => {
   );
 };
 
-export default ExtensonControls;
+export default PopupContents;
