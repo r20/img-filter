@@ -4,13 +4,19 @@
     <meta name="viewport" content="initial-scale=1, width=device-width" />
     <script src="js/vendor.js"></script>
     <style>
+      html {
+        overflow: hidden;
+      }
       body {
         font-family: Roboto, Helvetica, Arial, sans-serif;
         margin: 0px;
-        width: 800px;
+        overflow: hidden;
       }
       body > div {
         width: 800px;
+        /* For chrome, keeps gutter width even if gutters aren't showing */
+        scrollbar-gutter: stable;
+        overflow-y: auto;
       }
     </style>
   </head>

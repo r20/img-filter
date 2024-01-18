@@ -6,7 +6,7 @@ import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 
-import ExtensionControls from "./components/ExtensionControls";
+import PopupContents from "./components/PopupContents";
 
 import { CustomRulesContextProvider } from "./context/CustomRulesContext";
 import { ActiveTabContextProvider } from "./context/ActiveTabContext";
@@ -17,7 +17,7 @@ root.render(
   <React.StrictMode>
     <CustomRulesContextProvider>
       <ActiveTabContextProvider>
-        <ExtensionControls />
+        <PopupContents />
       </ActiveTabContextProvider>
     </CustomRulesContextProvider>
   </React.StrictMode>

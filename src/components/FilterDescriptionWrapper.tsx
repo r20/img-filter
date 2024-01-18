@@ -7,7 +7,7 @@ const FilterDesciptionWrapper = styled.div`
   display: flex;
   alignitems: center;
   gap: 15px;
-  width: 390px;
+  width: 380px;
   flex-shrink: 0;
 `;
 
